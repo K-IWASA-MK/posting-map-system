@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ポスティング 司令室</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="司令室">
+
+<meta name="theme-color" content="#c97a00">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
+
+<link rel="apple-touch-icon"
+sizes="180x180"
+href="https://area-management.github.io/posting-map-system/assets/icon-manager-180.png">
+
+<link rel="icon"
+href="https://area-management.github.io/posting-map-system/assets/icon-manager-180.png">
+
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body{
+  font-family:'Noto Sans JP',sans-serif;
+  background:
+  linear-gradient(
+    180deg,
+    #f8f8f8 0%,
+    #ececec 100%
+  );
+
+  min-height:100vh;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  overflow:hidden;
+}
+
+.container{
+  width:100%;
+  max-width:420px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  padding:40px 30px;
+}
+
+.logo-box{
+
+  width:110px;
+  height:110px;
+
+  background:#ffffff;
+
+  border-radius:28px;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  box-shadow:
+  0 15px 40px rgba(0,0,0,0.1);
+
+  margin-bottom:30px;
+
+  animation:float 4s ease-in-out infinite;
+}
+
+.logo-box img{
+  width:56px;
+  height:56px;
+}
+
+.sub{
+
+  font-size:16px;
+  font-weight:bold;
+  line-height:1.6;
+
+  color:#e63946;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
+
+  text-align:center;
+
+  margin-top:-10px;
+  margin-bottom:45px;
+}
+
+.launch-btn{
+
+  width:100%;
+
+  background:
+  linear-gradient(
+    180deg,
+    #e29100 0%,
+    #c97a00 100%
+  );
+
+  color:white;
+
+  text-decoration:none;
+
+  border-radius:999px;
+
+  padding:18px 20px;
+
+  text-align:center;
+
+  font-size:22px;
+  font-weight:900;
+
+  letter-spacing:0.03em;
+
+  box-shadow:
+  0 12px 30px rgba(201,122,0,0.3);
+
+  transition:all .18s ease;
+}
+
+.launch-btn:active{
+  transform:scale(0.97);
+}
+
+.bottom-note{
+
+  margin-top:28px;
+
+  font-size:13px;
+
+  color:#999;
+
+  letter-spacing:0.02em;
+}
+
+@keyframes float{
+
+  0%{
+    transform:translateY(0px);
+  }
+
+  50%{
+    transform:translateY(-8px);
+  }
+
+  100%{
+    transform:translateY(0px);
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="logo-box">
+    <img src="https://area-management.github.io/posting-map-system/assets/icon-manager-180.png">
+  </div>
+
+  <div class="sub">
+    ホーム画面へ追加してから<br>
+    アプリをご利用ください
+  </div>
+
+  <a
+    class="launch-btn"
+    href="https://script.google.com/macros/s/AKfycbyvR8B89xGhB_kr5OAFzgH0rAIUffGY2iQNqnyv4r32KZyg6GpMemrD4NuLfGrQbpeSTA/exec?mode=admin"
+  >
+    アプリを起動する
+  </a>
+
+  <div class="bottom-note">
+    Posting Management System
+  </div>
+
+</div>
+
+</body>
+</html>
