@@ -4,81 +4,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ポスアプリ</title>
+<title>ポスティング</title>
 
-<!-- iPhoneホーム画面用の最強設定 -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="ポスアプリ">
-<meta name="theme-color" content="#ff8c00">
+<meta name="apple-mobile-web-app-title" content="ポスティング">
+<meta name="theme-color" content="#c97a00">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<link rel="apple-touch-icon" sizes="180x180" href="https://k-iwasa-mk.github.io/posting-map-system/icon180-v2.png?v=50">
-<link rel="icon" href="https://k-iwasa-mk.github.io/posting-map-system/icon180-v2.png?v=50">
-
-<style>
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    font-family: -apple-system, sans-serif;
-    background-color: #f0f4f8;
-    color: #333;
-    text-align: center;
-  }
-  .container {
-    padding: 30px;
-    background: white;
-    border-radius: 20px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    max-width: 80%;
-  }
-  .icon-preview {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 20px;
-    border-radius: 18px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-  }
-  h1 { font-size: 20px; margin-bottom: 10px; color: #ff8c00; }
-  p { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 25px; }
-  
-  .btn {
-    display: inline-block;
-    background-color: #ff8c00;
-    color: white;
-    padding: 15px 40px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 18px;
-    box-shadow: 0 4px 15px rgba(255,140,0,0.3);
-    transition: transform 0.2s;
-  }
-  .btn:active { transform: scale(0.95); }
-  
-  .hint {
-    margin-top: 30px;
-    font-size: 12px;
-    color: #999;
-  }
-</style>
+<link rel="apple-touch-icon" sizes="180x180" href="https://area-management.github.io/posting-map-system/icon180-v2.png?v=50">
+<link rel="icon" href="https://area-management.github.io/posting-map-system/icon180-v2.png?v=50">
 </head>
 
-<body>
+<body style="margin:0; background:#f4f7f9;">
 
-<div class="container">
-  <img src="https://k-iwasa-mk.github.io/posting-map-system/icon180-v2.png" class="icon-preview" alt="icon">
-  <h1>ポスアプリ</h1>
-  <p>まずはiPhoneの共有ボタンから<br><strong>「ホーム画面に追加」</strong><br>をしてください。</p>
-  
-  <a href="https://script.google.com/macros/s/AKfycbyvR8B89xGhB_kr5OAFzgH0rAIUffGY2iQNqnyv4r32KZyg6GpMemrD4NuLfGrQbpeSTA/exec" class="btn">アプリを起動する</a>
+<div style="
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+height:100vh;
+font-family:sans-serif;
+text-align:center;
+padding:20px;
+">
 
-  <div class="hint">
-    ※ホーム画面に追加すると<br>アイコンから直接起動できます
+  <img src="https://area-management.github.io/posting-map-system/icon180-v2.png" style="width:80px; height:80px; border-radius:18px; margin-bottom:20px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+
+  <div style="font-size:24px; font-weight:bold; color:#c97a00; margin-bottom:10px;">
+    ポスティング
   </div>
+
+  <p style="font-size:14px; color:#666; margin-bottom:30px;">
+    ホーム画面に追加してから<br>起動してください
+  </p>
+
+  <a href="https://script.google.com/macros/s/AKfycbyvR8B89xGhB_kr5OAFzgH0rAIUffGY2iQNqnyv4r32KZyg6GpMemrD4NuLfGrQbpeSTA/exec" style="
+    display:inline-block;
+    background:#c97a00;
+    color:white;
+    text-decoration:none;
+    padding:15px 40px;
+    border-radius:30px;
+    font-weight:bold;
+    font-size:18px;
+    box-shadow:0 4px 15px rgba(201,122,0,0.3);
+  ">
+    アプリを起動する
+  </a>
+
 </div>
 
 </body>
