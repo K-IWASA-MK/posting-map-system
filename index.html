@@ -165,16 +165,29 @@
   async function startApp() {
     document.getElementById('screen-gateway').classList.add('hidden');
     document.getElementById('app-shell').classList.remove('hidden');
+    
+    // まず設定（登録）画面を出す（通信待ちで真っ白にしない）
     switchTab(currentUser ? 'area' : 'settings');
+    
     showLoading('同期中...');
-    const data = await api('getAppData');
-    hideLoading();
-    if (data) {
-      appData = data;
-      document.getElementById('sync-pct').textContent = currentUser ? '100%' : '0%';
-      renderView();
-    } else {
-      showToast('通信エラー: 再試行してください', true);
+    try {
+      const data = await api('getAppData');
+      hideLoading();
+      
+      if (data) {
+        appData = data;
+        const syncVal = currentUser ? '100%' : '0%';
+        const badge = document.getElementById('sync-pct');
+        if (badge) badge.textContent = syncVal;
+        renderView();
+      } else {
+        throw new Error("Empty data");
+      }
+    } catch (e) {
+      hideLoading();
+      console.error("Initial load failed:", e);
+      // エラーの具体的な中身をトーストに出す
+      showToast('通信エラー: ' + e.message, true);
       renderView();
     }
   }
