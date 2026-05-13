@@ -124,19 +124,27 @@
 </div>
 
 <div id="app-shell" class="hidden">
-  <header>
-    <div class="header-title" id="app-title">ポスティング</div>
-    <div class="header-badge" id="header-sync">● 100% SYNC</div>
-  </header>
-  <main id="main-view"></main>
-  <nav class="nav-bar">
-    <div class="nav-item active" onclick="switchTab('area')">
-      <div class="nav-icon">🗺️</div>
-      <div class="nav-label">エリア</div>
+  <header style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px; background:white; border-bottom:1px solid #f0f0f0;">
+    <div style="font-size:22px; font-weight:900; letter-spacing:-0.5px;">
+      <span style="color:#1a237e;">POSTING</span> <span style="color:#2196f3;">MAP</span>
     </div>
-    <div class="nav-item" onclick="switchTab('settings')">
-      <div class="nav-icon">👤</div>
-      <div class="nav-label">設定</div>
+    <div id="header-sync" style="font-size:12px; font-weight:800; color:#4caf50;">
+      ● 0% SYNC
+    </div>
+  </header>
+  <main id="main-view" style="flex:1; overflow-y:auto; background:#f8f9fa; padding:20px;"></main>
+  <nav class="nav-bar" style="height:70px; display:flex; background:white; border-top:1px solid #f0f0f0; padding-bottom:env(safe-area-inset-bottom);">
+    <div class="nav-item" onclick="switchTab('manual')" id="nav-manual">
+      <div class="nav-icon" style="font-size:24px;">📖</div>
+      <div class="nav-label" style="font-size:11px; margin-top:4px;">使い方</div>
+    </div>
+    <div class="nav-item" onclick="switchTab('area')" id="nav-area">
+      <div class="nav-icon" style="font-size:24px;">🗺️</div>
+      <div class="nav-label" style="font-size:11px; margin-top:4px;">エリア</div>
+    </div>
+    <div class="nav-item active" onclick="switchTab('settings')" id="nav-settings">
+      <div class="nav-icon" style="font-size:24px;">⚙️</div>
+      <div class="nav-label" style="font-size:11px; margin-top:4px;">設定</div>
     </div>
   </nav>
 </div>
@@ -145,7 +153,7 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbx4u1pbcaqDVTmatiN789lR9NrCCxhMoH7S8ZxttNzdg4vtF2edmGYIBIHnQ3YZow1WfQ/exec';
   let appData = null;
   let currentUser = JSON.parse(localStorage.getItem('posting_user')) || null;
-  let currentTab = 'area';
+  let currentTab = 'settings';
 
   async function api(action, params = {}, method = 'GET') {
     const url = new URL(API_URL);
@@ -159,7 +167,7 @@
       const response = await fetch(url, options);
       return await response.json();
     } catch (err) {
-      showToast('通信エラー', true);
+      console.error(err);
       return null;
     }
   }
@@ -169,22 +177,26 @@
     if (!isStandalone) {
       document.getElementById('screen-gateway').classList.remove('hidden');
       document.getElementById('app-shell').classList.add('hidden');
-      return;
+    } else {
+      startApp();
     }
-    startApp();
   }
 
   async function startApp() {
     document.getElementById('screen-gateway').classList.add('hidden');
     document.getElementById('app-shell').classList.remove('hidden');
-    renderView();
+    switchTab(currentUser ? 'area' : 'settings');
+    
     showLoading('同期中...');
     const data = await api('getAppData');
     hideLoading();
+    
     if (data) {
       appData = data;
-      document.getElementById('app-title').textContent = data.branchName || 'ポスティング';
+      document.getElementById('header-sync').innerHTML = `● ${currentUser ? '100%' : '0%'} SYNC`;
       renderView();
+    } else {
+      showToast('通信エラー: 再試行してください', true);
     }
   }
 
@@ -192,9 +204,9 @@
 
   function switchTab(tab) {
     currentTab = tab;
-    document.querySelectorAll('.nav-item').forEach((el, i) => {
-      el.classList.toggle('active', ['area', 'settings'][i] === tab);
-    });
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    const target = document.getElementById('nav-' + tab);
+    if (target) target.classList.add('active');
     renderView();
   }
 
@@ -202,67 +214,66 @@
     const main = document.getElementById('main-view');
     main.innerHTML = '';
     
-    if (currentTab === 'area') {
-      if (!appData) {
-        main.innerHTML = `<div class="card" style="text-align:center; padding:40px 20px;">
-          <p style="color:var(--muted);">データを同期しています...</p>
-          <button class="btn-submit" onclick="init()" style="margin-top:10px;">再試行する</button>
-        </div>`;
-        return;
-      }
-      const list = appData.areas.map(a => `
-        <div class="area-item" onclick="showAreaDetail('${a.name}')">
-          <div class="area-dot" style="background:${a.progress >= 100 ? 'var(--green)' : a.progress > 0 ? '#f4a261' : '#ccc'}"></div>
-          <div class="area-name">${a.name}</div>
-          <div style="font-size:12px; font-weight:700; color:var(--muted);">${a.progress}%</div>
-        </div>
-      `).join('');
-      main.innerHTML = `<div class="section-title">配布エリア一覧</div><div class="card" style="padding:0">${list}</div>`;
-    } else if (currentTab === 'settings') {
+    if (currentTab === 'settings') {
       if (!currentUser) {
         main.innerHTML = `
-          <div class="section-title">設定・配布員登録</div>
-          <div class="card reg-card">
-            <div class="reg-badge">未登録</div>
-            <div class="reg-title">お名前を登録してください</div>
-            <div class="reg-desc">一度登録すると、自動的にあなたの名前で報告されます。</div>
-            <div class="input-group">
-              <label class="input-label">苗字（全角）</label>
-              <input type="text" id="reg-last" class="input-field" placeholder="例：鈴木">
+          <h2 style="font-size:24px; font-weight:800; margin-bottom:24px;">設定・配布員登録</h2>
+          <div style="background:white; border-radius:24px; padding:30px; box-shadow:0 4px 20px rgba(0,0,0,0.05); text-align:center;">
+            <div style="display:inline-block; background:#fff3e0; color:#ff9800; padding:6px 16px; border-radius:20px; font-size:12px; font-weight:800; margin-bottom:20px;">未登録</div>
+            <h3 style="font-size:22px; font-weight:900; color:#1a237e; margin-bottom:10px;">お名前を登録してください</h3>
+            <p style="color:#999; font-size:14px; margin-bottom:30px; line-height:1.6;">一度登録すると、自動的にあなたの<br>名前で報告されます。</p>
+            <div style="text-align:left;">
+              <label style="display:block; font-size:14px; font-weight:700; color:#666; margin-bottom:8px;">苗字（全角）</label>
+              <input type="text" id="reg-last" placeholder="例：鈴木" style="width:100%; padding:16px; background:#f0f2f5; border:none; border-radius:12px; font-size:16px; margin-bottom:20px;">
+              <label style="display:block; font-size:14px; font-weight:700; color:#666; margin-bottom:8px;">名前（全角）</label>
+              <input type="text" id="reg-first" placeholder="例：一郎" style="width:100%; padding:16px; background:#f0f2f5; border:none; border-radius:12px; font-size:16px; margin-bottom:30px;">
+              <button onclick="handleRegister()" class="btn-premium" style="width:100%;">登録を完了する</button>
             </div>
-            <div class="input-group">
-              <label class="input-label">名前（全角）</label>
-              <input type="text" id="reg-first" class="input-field" placeholder="例：一郎">
-            </div>
-            <button class="btn-submit" onclick="handleRegister()">登録する</button>
           </div>
         `;
       } else {
         main.innerHTML = `
-          <div class="section-title">登録情報</div>
-          <div class="card" style="text-align:center;">
-            <div class="reg-badge" style="background:var(--green); color:white;">登録済み</div>
-            <h2 style="margin:10px 0;">${currentUser.name} 様</h2>
-            <p style="color:var(--muted); font-size:13px;">ID: ${currentUser.id}</p>
-            <button onclick="logout()" style="background:none; border:none; color:var(--red); font-size:13px; margin-top:20px; text-decoration:underline;">登録解除</button>
+          <h2 style="font-size:24px; font-weight:800; margin-bottom:24px;">設定</h2>
+          <div style="background:white; border-radius:24px; padding:30px; box-shadow:0 4px 20px rgba(0,0,0,0.05); text-align:center;">
+            <div style="display:inline-block; background:#e8f5e9; color:#4caf50; padding:6px 16px; border-radius:20px; font-size:12px; font-weight:800; margin-bottom:20px;">登録済み</div>
+            <h3 style="font-size:22px; font-weight:900; color:#1a237e; margin-bottom:5px;">${currentUser.name} 様</h3>
+            <p style="color:#999; font-size:12px; margin-bottom:30px;">ID: ${currentUser.id}</p>
+            <button onclick="logout()" style="background:none; border:none; color:#f44336; font-size:13px; font-weight:700; text-decoration:underline;">登録を解除する</button>
           </div>
         `;
       }
+    } else if (currentTab === 'area') {
+      if (!appData) {
+        main.innerHTML = `<div style="padding:40px; text-align:center;"><p style="color:#999;">データを同期しています...</p><button onclick="startApp()" class="btn-premium" style="margin-top:20px;">再試行する</button></div>`;
+        return;
+      }
+      const list = appData.areas.map(a => `
+        <div style="display:flex; align-items:center; padding:18px; background:white; border-radius:16px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.03);" onclick="showAreaDetail('${a.name}')">
+          <div style="width:10px; height:10px; border-radius:50%; background:${a.progress >= 100 ? '#4caf50' : a.progress > 0 ? '#ff9800' : '#ccc'}; margin-right:15px;"></div>
+          <div style="flex:1; font-weight:700; color:#333;">${a.name}</div>
+          <div style="font-size:12px; font-weight:800; color:#999;">${a.progress}%</div>
+        </div>
+      `).join('');
+      main.innerHTML = `<h2 style="font-size:22px; font-weight:800; margin-bottom:20px;">配布エリア一覧</h2>${list}`;
+    } else if (currentTab === 'manual') {
+      main.innerHTML = `<div style="padding:40px; text-align:center; color:#999;"><h3>使い方ガイド</h3><p>準備中...</p></div>`;
     }
   }
 
   async function handleRegister() {
     const last = document.getElementById('reg-last').value;
     const first = document.getElementById('reg-first').value;
-    if (!last || !first) return showToast('苗字と名前を入力してください');
+    if (!last || !first) return showToast('苗字と名前を入力してください', true);
     showLoading('登録中...');
     const res = await api('registerStaff', { lastName: last, firstName: first }, 'POST');
     hideLoading();
     if (res && res.success) {
       currentUser = { id: res.id, name: res.name };
       localStorage.setItem('posting_user', JSON.stringify(currentUser));
-      showToast('登録完了しました');
-      renderView();
+      showToast('登録が完了しました');
+      startApp();
+    } else {
+      showToast('登録に失敗しました', true);
     }
   }
 
@@ -270,10 +281,10 @@
   function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
   function showToast(msg, isErr=false) {
     const t = document.getElementById('toast');
-    t.textContent = msg; t.style.background = isErr ? 'var(--red)' : 'var(--navy)';
-    t.style.display = 'block'; setTimeout(() => t.style.display='none', 2000);
+    t.textContent = msg; t.style.background = isErr ? '#f44336' : '#1a237e';
+    t.style.display = 'block'; setTimeout(() => t.style.display='none', 3000);
   }
-  function logout() { localStorage.removeItem('posting_user'); currentUser=null; renderView(); }
+  function logout() { if(confirm("登録を解除しますか？")){localStorage.removeItem('posting_user'); currentUser=null; startApp();} }
   init();
 </script>
 </body>
