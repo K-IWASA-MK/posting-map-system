@@ -54,20 +54,88 @@
       flex: 1; display: flex; flex-direction: column; align-items: center;
       justify-content: center; color: #ccc;
     }
-    .nav-item.active { color: var(--navy); }
     .nav-icon { font-size: 24px; }
     .nav-label { font-size: 11px; font-weight: 700; margin-top: 4px; }
 
     /* Components */
     .view-container { flex: 1; overflow-y: auto; background: var(--light-bg); padding: 20px; }
-    .card { background: white; border-radius: 24px; padding: 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
-    .reg-badge { display: inline-block; background: #fff3e0; color: #ff9800; padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 800; margin-bottom: 20px; }
-    
-    input {
-      width: 100%; padding: 16px; background: #f0f2f5; border: none;
-      border-radius: 12px; font-size: 16px; margin-bottom: 20px; font-weight: 700;
+    /* 登録カードの調整 */
+    .setup-card {
+      background: white;
+      border-radius: 24px;
+      padding: 32px 24px;
+      margin: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     }
-    label { display: block; font-size: 14px; font-weight: 700; color: var(--gray); margin-bottom: 8px; }
+    .status-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+    .setup-card h2 {
+      font-size: 26px;
+      color: #1a237e;
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .setup-card p {
+      font-size: 15px;
+      color: #666;
+      margin-bottom: 32px;
+    }
+    .input-group {
+      margin-bottom: 24px;
+    }
+    .input-group label {
+      display: block;
+      font-weight: 700;
+      font-size: 15px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: 2px solid #f0f0f0;
+      background: #f8f9fa;
+      font-size: 16px;
+      transition: all 0.2s;
+    }
+    .input-group input:focus {
+      border-color: #1a237e;
+      background: white;
+      outline: none;
+    }
+    
+    /* 下部ナビゲーションの調整 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+      border-top: 1px solid #eee;
+    }
+    .nav-item {
+      text-align: center;
+      color: #999;
+      flex: 1;
+      font-size: 11px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .nav-item.active { color: #1a237e; }
+    .nav-item i {
+      display: block;
+      font-size: 26px;
+      margin-bottom: 4px;
+    }
 
     /* Loading Overlay */
     #loading-overlay {
@@ -210,50 +278,66 @@
   }
 
   function renderView() {
-    const main = document.getElementById('main-view');
+    const main = document.getElementById('view-content');
+    if (!main) return;
     main.innerHTML = '';
+    
     if (currentTab === 'settings') {
-      if (!currentUser) {
-        main.innerHTML = `
-          <h2 style="font-size:26px; font-weight:800; margin-bottom:24px;">設定・配布員登録</h2>
-          <div class="card">
-            <div class="reg-badge">未登録</div>
-            <h3 style="font-size:22px; font-weight:900; color:var(--navy); margin-bottom:10px;">お名前を登録してください</h3>
-            <p style="color:#999; font-size:14px; margin-bottom:30px; line-height:1.6;">一度登録すると、自動的にあなたの名前で報告されます。</p>
-            <div style="text-align:left;">
-              <label>苗字（全角）</label>
-              <input type="text" id="reg-last" placeholder="例：鈴木">
-              <label>名前（全角）</label>
-              <input type="text" id="reg-first" placeholder="例：一郎">
-              <button onclick="handleRegister()" class="btn-premium">登録を完了する</button>
-            </div>
-          </div>
-        `;
-      } else {
-        main.innerHTML = `
-          <h2 style="font-size:26px; font-weight:800; margin-bottom:24px;">設定</h2>
-          <div class="card" style="text-align:center;">
-            <div class="reg-badge" style="background:#e8f5e9; color:#4caf50;">登録済み</div>
-            <h3 style="font-size:24px; font-weight:900; color:var(--navy);">${currentUser.name} 様</h3>
-            <p style="color:#999; font-size:12px; margin-bottom:30px;">ID: ${currentUser.id}</p>
-            <button onclick="logout()" style="background:none; border:none; color:var(--red); font-size:14px; font-weight:700; text-decoration:underline;">登録を解除する</button>
-          </div>
-        `;
-      }
+      renderSettings();
     } else if (currentTab === 'area') {
-      if (!appData) {
-        main.innerHTML = `<div style="padding:100px 20px; text-align:center;"><p style="color:#999;">データを同期しています...</p><button onclick="startApp()" class="btn-premium" style="margin-top:30px; width:180px;">再試行する</button></div>`;
-        return;
-      }
-      const list = appData.areas.map(a => `
-        <div style="display:flex; align-items:center; padding:20px; background:white; border-radius:20px; margin-bottom:15px; box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+      renderAreaList();
+    } else if (currentTab === 'howto') {
+      main.innerHTML = `
+        <div class="view-title">使いかた</div>
+        <div class="setup-card">
+          <h2>準備中です</h2>
+          <p>マニュアルコンテンツを現在作成しています。しばらくお待ちください。</p>
+        </div>
+      `;
+    }
+  }
+
+  function renderSettings() {
+    const main = document.getElementById('view-content');
+    main.innerHTML = `
+      <div class="view-title">設定・配布員登録</div>
+      <div class="setup-card">
+        <div class="status-badge" style="background:${currentUser?'#e8f5e9':'#fff3e0'}; color:${currentUser?'#2e7d32':'#ef6c00'};">
+          ${currentUser ? '登録済み' : '未登録'}
+        </div>
+        <h2>お名前を登録してください</h2>
+        <p>一度登録すると、自動的にあなたの名前で報告されます。</p>
+        
+        <div class="input-group">
+          <label>苗字（全角）</label>
+          <input type="text" id="reg-last" placeholder="例：鈴木" value="${currentUser ? currentUser.name.split(' ')[0] : ''}">
+        </div>
+        <div class="input-group">
+          <label>名前（全角）</label>
+          <input type="text" id="reg-first" placeholder="例：一郎" value="${currentUser ? currentUser.name.split(' ')[1] : ''}">
+        </div>
+        
+        <button class="btn btn-primary" onclick="handleRegister()">
+          ${currentUser ? '登録情報を更新する' : '登録を完了する'}
+        </button>
+      </div>
+    `;
+  }
+
+  function renderAreaList() {
+    const main = document.getElementById('view-content');
+    if (!appData) {
+      main.innerHTML = `<div class="setup-card" style="text-align:center;"><p>データを同期しています...</p><button onclick="startApp()" class="btn btn-primary">再試行する</button></div>`;
+      return;
+    }
+    const list = appData.areas.map(a => `
+        <div class="setup-card" style="display:flex; align-items:center; margin-bottom:15px;">
           <div style="width:12px; height:12px; border-radius:50%; background:${a.progress >= 100 ? 'var(--green)' : a.progress > 0 ? 'var(--orange)' : '#ddd'}; margin-right:18px;"></div>
           <div style="flex:1; font-weight:800; color:#333; font-size:17px;">${a.name}</div>
           <div style="font-size:14px; font-weight:900; color:#999;">${a.progress}%</div>
         </div>
       `).join('');
-      main.innerHTML = `<h2 style="font-size:24px; font-weight:800; margin-bottom:25px;">配布エリア一覧</h2>${list}`;
-    }
+    main.innerHTML = `<div class="view-title">配布エリア一覧</div>${list}`;
   }
 
   async function handleRegister() {

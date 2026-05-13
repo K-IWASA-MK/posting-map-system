@@ -8,6 +8,7 @@
 const SPREADSHEET_ID = '1KuA5pN0ItODhwSJph-fwgj_U_ZyHrn9Osew92D99xBs';
 
 function getSS() {
+  if (!SPREADSHEET_ID) throw new Error("SPREADSHEET_ID is not defined.");
   return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
 
@@ -96,44 +97,32 @@ function createJsonResponse(data) {
 
 /**
  * モバイルアプリ用：全体サマリー取得
+ * 超高速版：全体進捗シートのみを参照
  */
 function getAppData() {
   const ss = getSS();
   const cache = CacheService.getScriptCache();
   const cachedData = cache.get("app_summary");
-  // キャッシュがあれば即座に返すが、今回は強制リフレッシュのために一旦ログのみ
+  if (cachedData) return JSON.parse(cachedData);
   
   const guideSheet = ss.getSheetByName(CONFIG.SHEET_GUIDE);
-  let totalDistributed = 0;
-  if (guideSheet) {
-    totalDistributed = guideSheet.getRange("H5").getValue();
-  }
+  if (!guideSheet) throw new Error("Guide sheet not found");
 
-  const exclude = [
-    CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL, CONFIG.SHEET_DISTRICT, CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL,
-  ];
+  // A列:エリア名, G列:進捗% (1行目ヘッダーを飛ばす)
+  // 全データを一括取得 (通信はこれ1回だけ！)
+  const lastRow = guideSheet.getLastRow();
+  if (lastRow < 2) return { branchName: "支部", areas: [] };
   
-  const allSheets = ss.getSheets();
-  const areas = allSheets
-    .filter((s) => !exclude.includes(s.getName()) && !s.isSheetHidden())
-    .map((s) => {
-      // 高速化：各シートの進捗をキャッシュから取得するか、最小限の読み込みにする
-      const lastRow = s.getLastRow();
-      let done = 0, total = 0;
-      if (lastRow >= 2) {
-        // 1列まるごと取得して計算（高速）
-        const data = s.getRange(2, 4, lastRow - 1, 1).getValues();
-        total = data.length;
-        done = data.filter((r) => r[0] === true).length;
-      }
-      return {
-        name: s.getName(),
-        progress: total > 0 ? Math.round((done / total) * 100) : 0,
-        count: total,
-      };
-    });
+  const values = guideSheet.getRange(2, 1, lastRow - 1, 8).getValues();
+  const totalDistributed = guideSheet.getRange("H5").getValue();
+
+  const areas = values
+    .filter(r => r[0] && r[0] !== "")
+    .map(r => ({
+      name: r[0],
+      progress: Math.round(parseFloat(r[6]) * 100) || 0,
+      count: 0
+    }));
 
   const roster = getRoster();
 
@@ -145,8 +134,7 @@ function getAppData() {
     staffList: roster,
   };
   
-  // 60秒間キャッシュ
-  cache.put("app_summary", JSON.stringify(response), 60);
+  cache.put("app_summary", JSON.stringify(response), 30);
   return response;
 }
 
@@ -218,9 +206,8 @@ function registerStaff(lastName, firstName) {
   
   // 重複チェック
   const existing = s.getRange(2, 2, lastRow > 1 ? lastRow - 1 : 1, 1).getValues();
-  if (existing.some(r => r[0] === name)) {
-    // 既存ユーザーを返す
-    const rowIndex = existing.findIndex(r => r[0] === name);
+  const rowIndex = existing.findIndex(r => r[0] === name);
+  if (rowIndex !== -1) {
     return { success: true, id: s.getRange(rowIndex + 2, 1).getValue(), name: name };
   }
 
