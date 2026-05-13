@@ -53,17 +53,17 @@
     /* Components */
     .view-container { 
       flex: 1; overflow-y: auto; background: var(--light-bg); 
-      padding: 0 12px; display: flex; flex-direction: column;
+      padding: 12px 12px 24px; display: flex; flex-direction: column;
       -webkit-overflow-scrolling: touch;
     }
     /* 登録カードの調整 */
     .setup-card {
       background: white;
       border-radius: 24px;
-      padding: 32px 24px 60px;
-      margin: 12px 0;
+      padding: 32px 24px 40px;
+      margin: 0;
       width: 100%;
-      min-height: calc(100% - 24px);
+      min-height: calc(100% + 20px);
       box-shadow: 0 10px 30px rgba(0,0,0,0.05);
       flex-shrink: 0;
     }
@@ -115,12 +115,12 @@
     .bottom-nav {
       position: fixed;
       bottom: 0; left: 0; right: 0;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(10px);
+      background: #ffffff;
       display: flex;
       justify-content: space-around;
       padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
       border-top: 1px solid #eee;
+      z-index: 1000;
     }
     .nav-item {
       text-align: center;
@@ -323,11 +323,6 @@
         <button class="btn btn-primary" onclick="handleRegister()">
           ${currentUser ? '登録情報を更新する' : '登録を完了する'}
         </button>
-        
-        <!-- スクロール確認用ダミー -->
-        <div style="height: 600px; margin-top: 20px; background: linear-gradient(to bottom, #eee, transparent); border-radius: 20px; display: flex; align-items: center; justify-content: center; color: #999;">
-          ↓ スクロールのテスト用領域 ↓
-        </div>
       </div>
     `;
   }
