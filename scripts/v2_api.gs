@@ -7,19 +7,6 @@
 // =============================
 const SPREADSHEET_ID = '1KuA5pN0ItODhwSJph-fwgj_U_ZyHrn9Osew92D99xBs';
 
-// シート名・設定の定義
-const CONFIG = {
-  SHEET_GUIDE: "全体進捗",
-  SHEET_ROSTER: "配布員名簿",
-  SHEET_TEMPLATE: "TEMPLATE",
-  SHEET_POSTAL: "郵便番号",
-  SHEET_DISTRICT: "地区割",
-  SHEET_MASTER_EXPORT: "マスター書き出し",
-  SHEET_REPORT: "報告ログ",
-  SHEET_MANUAL: "マニュアル",
-  TARGET_GOAL: 50000 // デフォルトの目標数
-};
-
 function getSS() {
   return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
@@ -112,39 +99,37 @@ function createJsonResponse(data) {
  */
 function getAppData() {
   const ss = getSS();
+  console.log("Testing Connection to SS: " + ss.getName());
+  
   const guideSheet = ss.getSheetByName(CONFIG.SHEET_GUIDE);
+  console.log("Guide Sheet Found: " + (guideSheet ? "Yes" : "No (" + CONFIG.SHEET_GUIDE + ")"));
+  
   let totalDistributed = 0;
-
   if (guideSheet) {
     totalDistributed = guideSheet.getRange("H5").getValue();
-    if (typeof totalDistributed === "string") {
-      totalDistributed =
-        parseInt(totalDistributed.split("/")[0].replace(/,/g, "")) || 0;
-    }
+    console.log("Total Distributed (H5): " + totalDistributed);
   }
 
   const exclude = [
-    CONFIG.SHEET_GUIDE,
-    CONFIG.SHEET_ROSTER,
-    CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL,
-    CONFIG.SHEET_DISTRICT,
-    CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT,
-    CONFIG.SHEET_MANUAL,
+    CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE,
+    CONFIG.SHEET_POSTAL, CONFIG.SHEET_DISTRICT, CONFIG.SHEET_MASTER_EXPORT,
+    CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL,
   ];
-  const areas = ss
-    .getSheets()
+  
+  const allSheets = ss.getSheets();
+  console.log("Total Sheets in SS: " + allSheets.length);
+
+  const areas = allSheets
     .filter((s) => !exclude.includes(s.getName()) && !s.isSheetHidden())
     .map((s) => {
       const lastRow = s.getLastRow();
-      let done = 0;
-      let total = 0;
+      let done = 0, total = 0;
       if (lastRow >= 2) {
         const data = s.getRange(2, 4, lastRow - 1, 1).getValues();
         total = data.length;
         done = data.filter((r) => r[0] === true).length;
       }
+      console.log("Area Processed: " + s.getName() + " (Total: " + total + ", Done: " + done + ")");
       return {
         name: s.getName(),
         progress: total > 0 ? Math.round((done / total) * 100) : 0,
@@ -152,193 +137,94 @@ function getAppData() {
       };
     });
 
+  const roster = getRoster();
+  console.log("Staff Roster Count: " + (roster ? roster.length : 0));
+
   return {
     branchName: ss.getName().split(/[ 　]/)[0] || "支部",
     totalDistributed: totalDistributed,
     targetGoal: CONFIG.TARGET_GOAL,
     areas: areas,
-    staffList: getRoster(),
+    staffList: roster,
   };
 }
 
 /**
- * モバイルアプリ用：エリア詳細取得（爆速キャッシュ版）
+ * エリア詳細情報の取得
  */
 function getAreaDetails(areaName) {
-  const cache = CacheService.getScriptCache();
-  const cached = cache.get("DETAILS_" + areaName);
-  if (cached) return JSON.parse(cached);
+  const s = getSS().getSheetByName(areaName);
+  if (!s) return { success: false, message: "Area not found" };
 
-  const ss = getSS();
-  const sheet = ss.getSheetByName(areaName);
-  if (!sheet) return [];
+  const lastRow = s.getLastRow();
+  if (lastRow < 2) return { success: true, data: [] };
 
-  const lastRow = sheet.getLastRow();
-  if (lastRow < 2) return [];
+  const values = s.getRange(2, 1, lastRow - 1, 6).getValues();
+  const data = values.map((r, i) => ({
+    id: i + 2,
+    town: r[0],
+    street: r[1],
+    houseCount: r[2],
+    isDone: r[3],
+    staffName: r[4],
+    timestamp: r[5]
+  }));
 
-  const data = sheet.getRange(2, 1, lastRow - 1, 8).getValues();
-  const result = data
-    .filter((row) => row[0] !== "")
-    .slice(0, 100)
-    .map((row, index) => ({
-      id: index + 2,
-      address: row[0],
-      isDone: row[3] === true,
-      count: row[5],
-      staff: row[6],
-      memo: row[2],
-    }));
-
-  // 25分間キャッシュ（詳細データは頻繁に変わるため短め）
-  cache.put("DETAILS_" + areaName, JSON.stringify(result), 1500);
-  return result;
+  return { success: true, data: data };
 }
 
 /**
- * モバイルアプリ用：配布報告
+ * 名簿の取得
  */
-function submitDistribution(
-  areaName,
-  rowId,
-  staffName,
-  count,
-  isDone,
-  staffId,
-) {
-  const ss = getSS();
-  const sheet = ss.getSheetByName(areaName);
-  if (!sheet) throw new Error("Area not found");
-
-  const now = Utilities.formatDate(new Date(), "JST", "MM/dd HH:mm");
-
-  // キャッシュ更新用の差分計算
-  const oldStatus = sheet.getRange(rowId, 4).getValue();
-  const isDoneChanged = isDone === oldStatus ? 0 : isDone ? 1 : -1;
-
-  // D列:完了, E列:日時, F列:枚数, G列:名前, H列:ID を一括書き込み
-  sheet
-    .getRange(rowId, 4, 1, 5)
-    .setValues([[isDone, isDone ? now : "", count, staffName, staffId || ""]]);
-
-  updateSheetSummary(sheet);
-  updateAreaCache(areaName, isDoneChanged);
-
-  // 詳細データのキャッシュを削除（次回アクセス時に最新を読み込むため）
-  CacheService.getScriptCache().remove("DETAILS_" + areaName);
-
-  return { success: true, timestamp: now };
-}
-
 function getRoster() {
-  try {
-    const sheet = getSS().getSheetByName(
-      CONFIG.SHEET_ROSTER,
-    );
-    if (!sheet) return [];
-    const lastRow = sheet.getLastRow();
-    if (lastRow < 2) return [];
-
-    const data = sheet.getRange(2, 1, lastRow - 1, 3).getValues();
-    return data
-      .map((r) => {
-        const idStr = ("000" + r[0]).slice(-3); // 001 形式に整形
-        return {
-          id: r[0],
-          displayName: `${idStr}  ${r[1]} ${r[2]}`.trim(), // スペース2つ
-          lastName: r[1],
-          firstName: r[2],
-        };
-      })
-      .filter((item) => item.lastName);
-  } catch (e) {
-    return [];
-  }
+  const s = getSS().getSheetByName(CONFIG.SHEET_ROSTER);
+  if (!s) return [];
+  const lastRow = s.getLastRow();
+  if (lastRow < 2) return [];
+  return s.getRange(2, 1, lastRow - 1, 2).getValues().map(r => ({ id: r[0], name: r[1] }));
 }
 
 /**
- * 新規スタッフ登録（ロック機能付き）
+ * 進捗報告の登録
+ */
+function submitDistribution(areaName, rowId, staffName, count, isDone, staffId) {
+  const ss = getSS();
+  const s = ss.getSheetByName(areaName);
+  if (!s) return { success: false, message: "Sheet not found: " + areaName };
+
+  const now = new Date();
+  s.getRange(rowId, 4, 1, 3).setValues([[isDone, staffName, now]]);
+  
+  // ログ記録
+  const reportSheet = ss.getSheetByName(CONFIG.SHEET_REPORT);
+  if (reportSheet) {
+    reportSheet.appendRow([now, areaName, rowId, staffName, count, isDone, staffId]);
+  }
+
+  return { success: true };
+}
+
+/**
+ * 配布員の新規登録
  */
 function registerStaff(lastName, firstName) {
-  if (!lastName || !firstName)
-    return { success: false, message: "苗字と名前の両方を入力してください" };
+  const ss = getSS();
+  const s = ss.getSheetByName(CONFIG.SHEET_ROSTER);
+  if (!s) return { success: false, message: "Roster sheet not found" };
 
-  const lock = LockService.getScriptLock();
-  try {
-    lock.waitLock(30000);
-    const ss = getSS();
-    const sheet = ss.getSheetByName(CONFIG.SHEET_ROSTER);
-
-    // ID発行ロジック
-    const data = sheet.getDataRange().getValues();
-    for (let i = 1; i < data.length; i++) {
-      if (data[i][1] === lastName && data[i][2] === firstName) {
-        const existingId = data[i][0];
-        const idStr = ("000" + existingId).slice(-3);
-        lock.releaseLock();
-        return {
-          success: true,
-          id: existingId,
-          name: `${lastName} ${firstName}`,
-          displayName: `${idStr}  ${lastName} ${firstName}`,
-          message: "既存の登録情報を復元しました"
-        };
-      }
-    }
-
-    // 新規登録
-    const nextId = data.length > 1 ? Math.max(...data.slice(1).map(r => r[0] || 0)) + 1 : 1;
-    sheet.appendRow([nextId, lastName, firstName, new Date()]);
-    
-    lock.releaseLock();
-    const idStr = ("000" + nextId).slice(-3);
-    return {
-      success: true,
-      id: nextId,
-      name: `${lastName} ${firstName}`,
-      displayName: `${idStr}  ${lastName} ${firstName}`,
-    };
-  } catch (e) {
-    if (lock.hasLock()) lock.releaseLock();
-    return { success: false, message: "登録エラー: " + e.message };
+  const name = lastName + " " + firstName;
+  const lastRow = s.getLastRow();
+  
+  // 重複チェック
+  const existing = s.getRange(2, 2, lastRow > 1 ? lastRow - 1 : 1, 1).getValues();
+  if (existing.some(r => r[0] === name)) {
+    // 既存ユーザーを返す
+    const rowIndex = existing.findIndex(r => r[0] === name);
+    return { success: true, id: s.getRange(rowIndex + 2, 1).getValue(), name: name };
   }
-}
 
-function isNotAdmin() {
-  const user = Session.getActiveUser().getEmail();
-  const owner = getSS().getOwner().getEmail();
-  if (user !== owner) {
-    SpreadsheetApp.getUi().alert("❌ 管理者専用です。");
-    return true;
-  }
-  return false;
-}
-
-function showAppUrl() {
-  const url = ScriptApp.getService().getUrl();
-  const html = `<div style="padding:20px; text-align:center;">
-    <p>モバイルアプリのURL:</p>
-    <input type="text" value="${url}" style="width:100%; padding:10px;" readonly onclick="this.select()">
-    <br><br>
-    <a href="${url}" target="_blank" style="padding:10px 20px; background:#1a73e8; color:white; text-decoration:none; border-radius:5px;">アプリを開く</a>
-  </div>`;
-  SpreadsheetApp.getUi().showModalDialog(
-    HtmlService.createHtmlOutput(html).setWidth(400).setHeight(200),
-    "スマホアプリURL",
-  );
-}
-
-function openMapDashboard() {
-  const apiKey = PropertiesService.getScriptProperties().getProperty(
-    "GOOGLE_MAPS_API_KEY",
-  );
-  if (!apiKey) {
-    SpreadsheetApp.getUi().alert("APIキー未設定です。");
-    return;
-  }
-  const html = HtmlService.createTemplateFromFile("map_dashboard");
-  html.apiKey = apiKey;
-  SpreadsheetApp.getUi().showModalDialog(
-    html.evaluate().setWidth(1000).setHeight(700),
-    "戦況マップ",
-  );
+  const newId = "S" + Utilities.formatDate(new Date(), "JST", "yyyyMMddHHmmss");
+  s.appendRow([newId, name, new Date()]);
+  
+  return { success: true, id: newId, name: name };
 }

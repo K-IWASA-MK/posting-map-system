@@ -1,7 +1,20 @@
-# Once allow everything but ignore backups
-node_modules/
-.git/
+**/*.bak
+**/*.gs_old
+**/*.tmp
 backup_*/
-*.gs.bak
 gas_v2_backup.gs
-gas.gs
+gas.gs.bak
+gas_v2.gs.step1_stable.gs
+SKILL.md
+README.md
+CLAUDE.md
+AGENTS.md
+.gitignore
+.cursorignore
+node_modules/
+package.json
+package-lock.json
+index.html
+manager.html
+assets/
+data/
