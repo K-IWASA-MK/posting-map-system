@@ -120,21 +120,28 @@
 
   <!-- Gateway / Splash Screen (Safari用) -->
   <div id="screen-gateway" class="hidden">
-    <div style="height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; text-align:center; background:#f8f9fa;">
-      <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=70" width="120" style="border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.1); margin-bottom:30px;">
-      <h1 style="font-size:28px; font-weight:900; color:var(--navy); margin:0;">ポスティング</h1>
-      <p style="margin:20px 0 40px; color:var(--muted); line-height:1.6;">
-        下の共有ボタンから<br>
-        <b>「ホーム画面に追加」</b>して<br>
-        アプリとして起動してください。
-      </p>
-      <button class="btn-submit" onclick="forceStart()" style="background:#d47c00; border:none; padding:18px 40px; border-radius:40px; font-size:18px; font-weight:900; box-shadow:0 8px 20px rgba(212,124,0,0.3);">
+    <div style="height:100vh; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:40px; text-align:center; background:#ffffff; position:fixed; inset:0; z-index:9999;">
+      <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=70" width="140" style="border-radius:35px; box-shadow:0 15px 40px rgba(0,0,0,0.15); margin-bottom:40px;">
+      
+      <h1 style="font-size:42px; font-weight:900; color:#e63946; margin:0; letter-spacing:-1px; text-shadow: 2px 2px 0px rgba(0,0,0,0.05);">
+        ポスティング
+      </h1>
+      
+      <div style="margin:30px 0 50px;">
+        <p style="font-size:16px; font-weight:700; color:var(--text); margin-bottom:8px;">ホーム画面に追加して起動</p>
+        <p style="font-size:13px; color:var(--muted); line-height:1.6;">
+          下の共有ボタンから<br>
+          「ホーム画面に追加」を選択してください
+        </p>
+      </div>
+
+      <button class="btn-submit" onclick="forceStart()" style="background:#e63946; color:white; border:none; padding:20px 50px; border-radius:50px; font-size:18px; font-weight:900; box-shadow:0 10px 25px rgba(230,57,70,0.3); width:80%; max-width:300px;">
         アプリを起動する
       </button>
     </div>
   </div>
 
-  <div id="app-shell">
+  <div id="app-shell" class="hidden">
 <div id="app">
   <header>
     <div class="header-title" id="app-title">ポスティング</div>
@@ -145,15 +152,14 @@
     <!-- UI will be rendered here -->
   </main>
 
-  <nav id="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('guide')">
-      <span class="nav-icon">📋</span><span>使い方</span>
-    </div>
-    <div class="nav-item" onclick="switchTab('area')">
-      <span class="nav-icon">🗺</span><span>エリア</span>
+  <nav class="nav-bar">
+    <div class="nav-item active" onclick="switchTab('area')">
+      <div class="nav-icon">🗺️</div>
+      <div class="nav-label">エリア</div>
     </div>
     <div class="nav-item" onclick="switchTab('settings')">
-      <span class="nav-icon">⚙️</span><span>設定</span>
+      <div class="nav-icon">👤</div>
+      <div class="nav-label">設定</div>
     </div>
   </nav>
 </div>
@@ -162,7 +168,7 @@
   const API_URL = 'https://script.google.com/macros/s/AKfycbx4u1pbcaqDVTmatiN789lR9NrCCxhMoH7S8ZxttNzdg4vtF2edmGYIBIHnQ3YZow1WfQ/exec';
   let appData = null;
   let currentUser = JSON.parse(localStorage.getItem('posting_user')) || null;
-  let currentTab = 'guide';
+  let currentTab = 'area'; // エリアを初期タブに
 
   // API 通信
   async function api(action, params = {}, method = 'GET') {
@@ -226,20 +232,10 @@
     const main = document.getElementById('main-view');
     main.innerHTML = '';
     
-    if (currentTab === 'guide') {
-      main.innerHTML = `
-        <div class="card" style="background:var(--navy); color:white;">
-          <h2 style="margin:0; font-size:22px;">POSTING <span style="color:var(--cyan)">MAP</span></h2>
-          <p style="opacity:0.7; font-size:12px; margin-top:8px;">リアルタイム配布管理システム</p>
-        </div>
-        <div class="section-title">使い方ガイド</div>
-        <div class="card"><b>1. エリアを選択</b><br>配布する地区を選んで詳細を確認します。</div>
-        <div class="card"><b>2. 配布と報告</b><br>完了したらチェックを入れ枚数を保存します。</div>
-      `;
-    } else if (currentTab === 'area') {
+    if (currentTab === 'area') {
       if (!appData) {
         main.innerHTML = `<div class="card" style="text-align:center; padding:40px 20px;">
-          <p style="color:var(--muted);">データを取得できませんでした</p>
+          <p style="color:var(--muted);">データを同期しています...</p>
           <button class="btn-submit" onclick="init()" style="margin-top:10px;">再試行する</button>
         </div>`;
         return;
@@ -251,7 +247,7 @@
           <div style="font-size:12px; font-weight:700; color:var(--muted);">${a.progress}%</div>
         </div>
       `).join('');
-      main.innerHTML = `<div class="section-title">エリア一覧</div><div class="card" style="padding:0">${list}</div>`;
+      main.innerHTML = `<div class="section-title">配布エリア一覧</div><div class="card" style="padding:0">${list}</div>`;
     } else if (currentTab === 'settings') {
       if (!currentUser) {
         main.innerHTML = `
