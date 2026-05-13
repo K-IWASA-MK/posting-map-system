@@ -167,13 +167,17 @@
 
   // 初期化
   async function init() {
-    showLoading('起動中...');
+    renderView(); // まず描画
+    showLoading('同期中...');
     const data = await api('getAppData');
     hideLoading();
     if (data) {
       appData = data;
       document.getElementById('app-title').textContent = data.branchName || 'ポスティング';
       renderView();
+    } else {
+      // 失敗時は再試行ボタンなどを出せるようにする
+      showToast('データの取得に失敗しました。電波の良い場所で再読み込みしてください', true);
     }
   }
 
@@ -200,6 +204,13 @@
         <div class="card"><b>2. 配布と報告</b><br>完了したらチェックを入れ枚数を保存します。</div>
       `;
     } else if (currentTab === 'area') {
+      if (!appData) {
+        main.innerHTML = `<div class="card" style="text-align:center; padding:40px 20px;">
+          <p style="color:var(--muted);">データを取得できませんでした</p>
+          <button class="btn-submit" onclick="init()" style="margin-top:10px;">再試行する</button>
+        </div>`;
+        return;
+      }
       const list = appData.areas.map(a => `
         <div class="area-item" onclick="showAreaDetail('${a.name}')">
           <div class="area-dot" style="background:${a.progress >= 100 ? 'var(--green)' : a.progress > 0 ? '#f4a261' : '#ccc'}"></div>
