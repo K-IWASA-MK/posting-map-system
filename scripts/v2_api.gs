@@ -1,33 +1,83 @@
 /**
- * GAS v2 - Web App API モジュール
- * - doGet() エントリポイント
- * - モバイルアプリ通信用API
+ * GAS v2 - API専用エンジン
  */
 
 // =============================
-// ① HTML表示 & モバイルアプリAPI
+// ① APIエントリポイント
 // =============================
 
+// GETリクエスト：データの取得
 function doGet(e) {
-  // JSONを要求された場合（マップダッシュボード等）
-  if (e && e.parameter && e.parameter.data === "json") {
-    return ContentService.createTextOutput(
-      JSON.stringify(getMapData()),
-    ).setMimeType(ContentService.MimeType.JSON);
+  const action = e.parameter.action;
+  let response;
+
+  try {
+    switch (action) {
+      case 'getAppData':
+        response = getAppData();
+        break;
+      case 'getAreaDetails':
+        response = getAreaDetails(e.parameter.areaName);
+        break;
+      case 'getRoster':
+        response = getRoster();
+        break;
+      default:
+        response = { success: false, message: 'Invalid GET action: ' + action };
+    }
+  } catch (err) {
+    response = { success: false, message: err.toString() };
   }
-  // 通常はHTMLを表示
-  return HtmlService.createTemplateFromFile("index")
-    .evaluate()
-    .setTitle("ポスティングアプリ")
-    .addMetaTag(
-      "viewport",
-      "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
-    );
+
+  return createJsonResponse(response);
 }
 
-function include(filename) {
-  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+// POSTリクエスト：データの登録・更新
+function doPost(e) {
+  let postData;
+  try {
+    postData = JSON.parse(e.postData.contents);
+  } catch (f) {
+    postData = e.parameter;
+  }
+
+  const action = postData.action;
+  let response;
+
+  try {
+    switch (action) {
+      case 'submitDistribution':
+        response = submitDistribution(
+          postData.areaName,
+          postData.rowId,
+          postData.staffName,
+          postData.count,
+          postData.isDone,
+          postData.staffId
+        );
+        break;
+      case 'registerStaff':
+        response = registerStaff(postData.lastName, postData.firstName);
+        break;
+      default:
+        response = { success: false, message: 'Invalid POST action: ' + action };
+    }
+  } catch (err) {
+    response = { success: false, message: err.toString() };
+  }
+
+  return createJsonResponse(response);
 }
+
+// 共通：JSONレスポンス作成
+function createJsonResponse(data) {
+  return ContentService.createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// =============================
+// ② データ取得ロジック
+// =============================
 
 /**
  * モバイルアプリ用：全体サマリー取得

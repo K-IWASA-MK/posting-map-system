@@ -1,0 +1,20 @@
+# Dependency & Environment
+node_modules/
+.npm/
+.clasp/
+.clasprc.json
+dist/
+
+# Version Control
+.git/
+
+# Backups & Temporaries
+backups/
+backup_*/
+*.bak
+*.gs_old
+*.tmp
+.DS_Store
+
+# Logs
+*.log

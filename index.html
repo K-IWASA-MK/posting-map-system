@@ -1,198 +1,276 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>ポスティング</title>
+<title>ポスティング・プロ</title>
 
+<!-- iPhone PWA 最適化 -->
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="ポスティング">
-
-<meta name="theme-color" content="#c97a00">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#0a2540">
 
-<link rel="apple-touch-icon"
-sizes="180x180"
-href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=70"> <!-- [PRODUCTION ASSET] -->
+<link rel="apple-touch-icon" sizes="180x180" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=70">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=70">
 
-<link rel="icon"
-href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=70"> <!-- [PRODUCTION ASSET] -->
-
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
 
 <style>
-
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  -webkit-tap-highlight-color: transparent;
-}
-
-body{
-  font-family:'Noto Sans JP',sans-serif;
-  background:
-  linear-gradient(
-    180deg,
-    #f8f8f8 0%,
-    #ececec 100%
-  );
-
-  min-height:100vh;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  overflow:hidden;
-}
-
-.container{
-  width:100%;
-  max-width:420px;
-
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-
-  padding:40px 30px;
-}
-
-.logo-box{
-
-  width:110px;
-  height:110px;
-
-  background:#ffffff;
-
-  border-radius:28px;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
-  box-shadow:
-  0 15px 40px rgba(0,0,0,0.1);
-
-  margin-bottom:30px;
-
-  animation:float 4s ease-in-out infinite;
-}
-
-.logo-box img{
-  width:56px;
-  height:56px;
-}
-
-.sub{
-
-  font-size:16px;
-  font-weight:bold;
-  line-height:1.6;
-
-  color:#e63946;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.15);
-
-  text-align:center;
-
-  margin-top:-10px;
-  margin-bottom:45px;
-}
-
-.launch-btn{
-
-  width:100%;
-
-  background:
-  linear-gradient(
-    180deg,
-    #e29100 0%,
-    #c97a00 100%
-  );
-
-  color:white;
-
-  text-decoration:none;
-
-  border-radius:999px;
-
-  padding:18px 20px;
-
-  text-align:center;
-
-  font-size:22px;
-  font-weight:900;
-
-  letter-spacing:0.03em;
-
-  box-shadow:
-  0 12px 30px rgba(201,122,0,0.3);
-
-  transition:all .18s ease;
-}
-
-.launch-btn:active{
-  transform:scale(0.97);
-}
-
-.bottom-note{
-
-  margin-top:28px;
-
-  font-size:13px;
-
-  color:#999;
-
-  letter-spacing:0.02em;
-}
-
-@keyframes float{
-
-  0%{
-    transform:translateY(0px);
+  /* ── CSS Variable & Reset ── */
+  :root {
+    --navy:   #0a2540;
+    --blue:   #0077b6;
+    --cyan:   #00b4d8;
+    --red:    #e63946;
+    --green:  #2dc653;
+    --bg:     #f0f4f8;
+    --card:   #ffffff;
+    --text:   #1a2533;
+    --muted:  #6b7a8d;
+    --border: #e2e8f0;
+    --header-h: 56px;
+    --nav-h:    65px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+  body {
+    margin: 0; font-family: 'Noto Sans JP', sans-serif;
+    background: var(--bg); color: var(--text);
+    height: 100vh; overflow: hidden;
   }
 
-  50%{
-    transform:translateY(-8px);
+  /* ── App Shell ── */
+  #app { height: 100vh; display: flex; flex-direction: column; }
+  
+  /* ── Header ── */
+  header {
+    height: calc(var(--header-h) + env(safe-area-inset-top, 0)); 
+    background: var(--navy); color: white;
+    padding: env(safe-area-inset-top, 0) 16px 0;
+    display: flex; align-items: center; flex-shrink: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 100;
+  }
+  .header-title { flex: 1; font-weight: 900; font-size: 17px; }
+  .header-badge { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 700; color: var(--cyan); }
+
+  /* ── Screens ── */
+  .screen { position: absolute; inset: 0; background: var(--bg); display: none; flex-direction: column; z-index: 10; }
+  .screen.active { display: flex; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  /* ── Main Scroll Area ── */
+  main {
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(var(--nav-h) + env(safe-area-inset-bottom, 0));
   }
 
-  100%{
-    transform:translateY(0px);
+  /* ── Bottom Nav ── */
+  nav {
+    height: calc(var(--nav-h) + env(safe-area-inset-bottom, 0));
+    background: var(--navy); position: fixed; bottom: 0; left: 0; right: 0;
+    display: flex; box-shadow: 0 -2px 10px rgba(0,0,0,0.2); z-index: 100;
   }
-}
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.4); font-size: 10px; font-weight: 700; gap: 4px;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+  }
+  .nav-item.active { color: var(--cyan); }
+  .nav-icon { font-size: 22px; }
 
+  /* ── Cards & UI Elements ── */
+  .card { background: var(--card); border-radius: 20px; margin: 12px; padding: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+  .section-title { padding: 20px 16px 8px; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+
+  /* Registration Form */
+  .reg-card { text-align: center; }
+  .reg-badge { background: #fff3e0; color: #ef6c00; font-size: 12px; font-weight: 700; padding: 6px 16px; border-radius: 20px; display: inline-block; margin-bottom: 20px; }
+  .reg-title { font-size: 20px; font-weight: 900; margin-bottom: 10px; }
+  .reg-desc { font-size: 13px; color: var(--muted); margin-bottom: 25px; line-height: 1.6; }
+  .input-group { text-align: left; margin-bottom: 20px; }
+  .input-label { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 8px; display: block; }
+  .input-field { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid var(--border); background: #f8f9fa; font-size: 16px; font-family: inherit; }
+  .btn-submit { background: var(--navy); color: white; border: none; width: 100%; padding: 18px; border-radius: 12px; font-size: 16px; font-weight: 900; margin-top: 10px; }
+
+  /* Area List */
+  .area-item { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); }
+  .area-item:last-child { border-bottom: none; }
+  .area-dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 12px; }
+  .area-name { flex: 1; font-weight: 700; font-size: 15px; }
+
+  /* Loading Spinner */
+  #loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 2000; color: white; flex-direction: column; }
+  .spinner { width: 40px; height: 40px; border: 4px solid rgba(255,255,255,0.1); border-top: 4px solid var(--cyan); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Toast */
+  #toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--navy); color: white; padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 700; display: none; z-index: 3000; }
 </style>
 </head>
-
 <body>
 
-<div class="container">
-
-  <div class="logo-box">
-    <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=70"> <!-- [PRODUCTION ASSET] -->
-  </div>
-
-  <div class="sub">
-    ホーム画面へ追加してから<br>
-    アプリをご利用ください
-  </div>
-
-  <a
-    class="launch-btn"
-    href="https://script.google.com/macros/s/AKfycbyvR8B89xGhB_kr5OAFzgH0rAIUffGY2iQNqnyv4r32KZyg6GpMemrD4NuLfGrQbpeSTA/exec"
-  >
-    アプリを起動する
-  </a>
-
-  <div class="bottom-note">
-    Posting Management System
-  </div>
-
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <p id="loading-msg">読み込み中...</p>
 </div>
 
+<div id="toast"></div>
+
+<div id="app">
+  <header>
+    <div class="header-title" id="app-title">ポスティング</div>
+    <div class="header-badge" id="header-sync">● 100% SYNC</div>
+  </header>
+
+  <main id="main-view">
+    <!-- UI will be rendered here -->
+  </main>
+
+  <nav id="bottom-nav">
+    <div class="nav-item active" onclick="switchTab('guide')">
+      <span class="nav-icon">📋</span><span>使い方</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('area')">
+      <span class="nav-icon">🗺</span><span>エリア</span>
+    </div>
+    <div class="nav-item" onclick="switchTab('settings')">
+      <span class="nav-icon">⚙️</span><span>設定</span>
+    </div>
+  </nav>
+</div>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbyvR8B89xGhB_kr5OAFzgH0rAIUffGY2iQNqnyv4r32KZyg6GpMemrD4NuLfGrQbpeSTA/exec';
+  let appData = null;
+  let currentUser = JSON.parse(localStorage.getItem('posting_user')) || null;
+  let currentTab = 'guide';
+
+  // API 通信
+  async function api(action, params = {}, method = 'GET') {
+    const url = new URL(API_URL);
+    if (method === 'GET') {
+      url.searchParams.append('action', action);
+      Object.keys(params).forEach(k => url.searchParams.append(k, params[k]));
+    }
+    try {
+      const options = { method: method, redirect: 'follow' };
+      if (method === 'POST') options.body = JSON.stringify({ action, ...params });
+      const response = await fetch(url, options);
+      return await response.json();
+    } catch (err) {
+      showToast('通信エラー', true);
+      return null;
+    }
+  }
+
+  // 初期化
+  async function init() {
+    showLoading('起動中...');
+    const data = await api('getAppData');
+    hideLoading();
+    if (data) {
+      appData = data;
+      document.getElementById('app-title').textContent = data.branchName || 'ポスティング';
+      renderView();
+    }
+  }
+
+  function switchTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.nav-item').forEach((el, i) => {
+      el.classList.toggle('active', ['guide', 'area', 'settings'][i] === tab);
+    });
+    renderView();
+  }
+
+  function renderView() {
+    const main = document.getElementById('main-view');
+    main.innerHTML = '';
+    
+    if (currentTab === 'guide') {
+      main.innerHTML = `
+        <div class="card" style="background:var(--navy); color:white;">
+          <h2 style="margin:0; font-size:22px;">POSTING <span style="color:var(--cyan)">MAP</span></h2>
+          <p style="opacity:0.7; font-size:12px; margin-top:8px;">リアルタイム配布管理システム</p>
+        </div>
+        <div class="section-title">使い方ガイド</div>
+        <div class="card"><b>1. エリアを選択</b><br>配布する地区を選んで詳細を確認します。</div>
+        <div class="card"><b>2. 配布と報告</b><br>完了したらチェックを入れ枚数を保存します。</div>
+      `;
+    } else if (currentTab === 'area') {
+      const list = appData.areas.map(a => `
+        <div class="area-item" onclick="showAreaDetail('${a.name}')">
+          <div class="area-dot" style="background:${a.progress >= 100 ? 'var(--green)' : a.progress > 0 ? '#f4a261' : '#ccc'}"></div>
+          <div class="area-name">${a.name}</div>
+          <div style="font-size:12px; font-weight:700; color:var(--muted);">${a.progress}%</div>
+        </div>
+      `).join('');
+      main.innerHTML = `<div class="section-title">エリア一覧</div><div class="card" style="padding:0">${list}</div>`;
+    } else if (currentTab === 'settings') {
+      if (!currentUser) {
+        main.innerHTML = `
+          <div class="section-title">設定・配布員登録</div>
+          <div class="card reg-card">
+            <div class="reg-badge">未登録</div>
+            <div class="reg-title">お名前を登録してください</div>
+            <div class="reg-desc">一度登録すると、自動的にあなたの名前で報告されます。</div>
+            <div class="input-group">
+              <label class="input-label">苗字（全角）</label>
+              <input type="text" id="reg-last" class="input-field" placeholder="例：鈴木">
+            </div>
+            <div class="input-group">
+              <label class="input-label">名前（全角）</label>
+              <input type="text" id="reg-first" class="input-field" placeholder="例：一郎">
+            </div>
+            <button class="btn-submit" onclick="handleRegister()">登録する</button>
+          </div>
+        `;
+      } else {
+        main.innerHTML = `
+          <div class="section-title">登録情報</div>
+          <div class="card" style="text-align:center;">
+            <div class="reg-badge" style="background:var(--green); color:white;">登録済み</div>
+            <h2 style="margin:10px 0;">${currentUser.name} 様</h2>
+            <p style="color:var(--muted); font-size:13px;">ID: ${currentUser.id}</p>
+            <button onclick="logout()" style="background:none; border:none; color:var(--red); font-size:13px; margin-top:20px; text-decoration:underline;">登録解除</button>
+          </div>
+        `;
+      }
+    }
+  }
+
+  async function handleRegister() {
+    const last = document.getElementById('reg-last').value;
+    const first = document.getElementById('reg-first').value;
+    if (!last || !first) return showToast('苗字と名前を入力してください');
+
+    showLoading('登録中...');
+    const res = await api('registerStaff', { lastName: last, firstName: first }, 'POST');
+    hideLoading();
+    
+    if (res && res.success) {
+      currentUser = { id: res.id, name: res.name, displayName: res.displayName };
+      localStorage.setItem('posting_user', JSON.stringify(currentUser));
+      showToast('登録完了しました');
+      renderView();
+    }
+  }
+
+  function showLoading(msg) {
+    document.getElementById('loading-msg').textContent = msg;
+    document.getElementById('loading-overlay').style.display = 'flex';
+  }
+  function hideLoading() { document.getElementById('loading-overlay').style.display = 'none'; }
+  function showToast(msg, isErr=false) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.style.background = isErr ? 'var(--red)' : 'var(--navy)';
+    t.style.display = 'block'; setTimeout(() => t.style.display='none', 2000);
+  }
+  function logout() { localStorage.removeItem('posting_user'); currentUser=null; renderView(); }
+
+  init();
+</script>
 </body>
 </html>
