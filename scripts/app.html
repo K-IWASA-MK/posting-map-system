@@ -3,34 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>POSTING APP NEXT</title>
+  <title>POSTING APP PRO</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'media',
       theme: {
         extend: {
-          colors: {
-            navy: {
-              DEFAULT: '#1a237e',
-              light: '#283593',
-              dark: '#0d1642'
-            },
-            apple: {
-              light: '#f5f5f7',
-              dark: '#000000'
-            }
-          },
-          fontFamily: {
-            sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
-          },
-          boxShadow: {
-            'neu-light': '8px 8px 16px #d1d1d6, -8px -8px 16px #ffffff',
-            'neu-dark': '8px 8px 16px #000000, -4px -4px 12px #1c1c1e',
-            'neu-inset-light': 'inset 4px 4px 8px #d1d1d6, inset -4px -4px 8px #ffffff',
-            'neu-inset-dark': 'inset 4px 4px 8px #000000, inset -2px -2px 6px #1c1c1e',
-          }
+          colors: { navy: '#1a237e', apple: '#f5f5f7' },
+          fontFamily: { sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'] }
         }
       }
     }
@@ -40,292 +22,189 @@
     .safe-top { padding-top: env(safe-area-inset-top); }
     .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .animate-spin-custom { animation: spin 1s linear infinite; }
+    .page { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
+    .page.active { display: block; opacity: 1; transform: none; }
     
-    .page { display: none; }
-    .page.active { display: block; animation: fadeIn 0.4s ease-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-    
-    .btn-neu { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .btn-neu:active { transform: scale(0.96); }
+    /* Neumorphic Base */
+    .neu-flat { @apply bg-white dark:bg-[#1c1c1e] shadow-[8px_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.4)]; }
+    .neu-inset { @apply bg-gray-50 dark:bg-black/20 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5)]; }
   </style>
 </head>
-<body class="bg-apple-light dark:bg-apple-dark text-[#1d1d1f] dark:text-[#f5f5f7] font-sans antialiased overflow-hidden select-none transition-colors duration-500">
+<body class="bg-apple dark:bg-black text-[#1d1d1f] dark:text-[#f5f5f7] font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
   <!-- Loading Overlay -->
-  <div id="loading" class="fixed inset-0 bg-apple-light dark:bg-apple-dark z-[2000] flex flex-col items-center justify-center transition-all duration-500">
-    <div class="w-14 h-14 border-4 border-gray-100 dark:border-gray-800 border-t-navy dark:border-t-blue-500 rounded-full animate-spin-custom"></div>
-    <p class="mt-8 text-navy dark:text-blue-400 font-black tracking-widest uppercase text-[10px]">Neural Syncing...</p>
+  <div id="loading" class="fixed inset-0 bg-apple dark:bg-black z-[2000] flex items-center justify-center transition-all duration-700">
+    <div class="w-12 h-12 border-[3px] border-navy/10 dark:border-white/10 border-t-navy dark:border-t-white rounded-full animate-spin"></div>
   </div>
-
-  <div id="toast" class="fixed bottom-32 left-10 right-10 md:left-1/2 md:-translate-x-1/2 md:w-auto px-8 py-4 rounded-3xl bg-navy/90 dark:bg-blue-600/90 backdrop-blur-xl text-white text-sm font-bold shadow-2xl hidden z-[11000] text-center border border-white/10"></div>
 
   <div id="app" class="flex flex-col h-screen overflow-hidden">
     
-    <!-- Header (Premium Glass) -->
-    <header id="header" class="bg-apple-light/70 dark:bg-apple-dark/70 backdrop-blur-3xl border-b border-white/10 safe-top z-[100]">
-      <div class="px-8 py-6 flex justify-between items-center h-20 md:h-24">
-        <div class="flex items-center gap-4">
-          <div class="w-10 h-10 bg-white/50 dark:bg-white/5 rounded-2xl flex items-center justify-center shadow-neu-light dark:shadow-neu-dark text-xl">🗺️</div>
-          <div class="flex flex-col">
-            <div id="branch-label" class="text-[9px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] leading-none">Branch Active</div>
-            <div class="text-xl font-black tracking-tighter text-navy dark:text-blue-400 mt-1">NEXT COMMAND</div>
-          </div>
-        </div>
-        <div id="header-progress" class="bg-white/50 dark:bg-white/5 text-navy dark:text-blue-400 px-4 py-1.5 rounded-full text-xs font-black tracking-tighter shadow-neu-inset-light dark:shadow-neu-inset-dark">0%</div>
+    <!-- Top Identity (Minimally placed) -->
+    <header class="safe-top px-10 py-10 flex justify-between items-center transition-opacity duration-300">
+      <div>
+        <h1 class="text-3xl font-black tracking-tighter text-navy dark:text-white">COMMAND</h1>
+        <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] mt-2">Operational Portal</p>
       </div>
+      <div id="sync-status" class="w-2.5 h-2.5 bg-green-500 rounded-full shadow-[0_0_15px_#22c55e]"></div>
     </header>
 
-    <!-- Main Content -->
-    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar safe-bottom">
+    <!-- Unified Content Area -->
+    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-10 space-y-12 pb-48">
 
-      <!-- PAGE 1: ガイド (Hybrid Style) -->
-      <div class="page active" id="page-guide">
-        <div class="m-8 bg-navy dark:bg-blue-900 rounded-[3rem] p-12 text-white shadow-neu-light dark:shadow-neu-dark relative overflow-hidden group">
-          <div class="relative z-10">
-            <div class="text-[10px] font-black text-blue-300 uppercase tracking-[0.3em] mb-4">Strategic Onboarding</div>
-            <h2 class="text-4xl font-black tracking-tight leading-tight mb-6">ポスティングの<br>再定義</h2>
-            <p class="text-sm text-white/60 leading-relaxed font-medium max-w-xs">最先端の UI で、活動をより効率的に、より美しく。勝利へのロードマップはここから。</p>
-          </div>
-          <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-blue-500 rounded-full blur-[120px] opacity-20 group-hover:scale-125 transition-transform duration-1000"></div>
+      <!-- SECTION: GUIDE -->
+      <section id="page-guide" class="page active space-y-10">
+        <div class="neu-flat rounded-[3rem] p-12 text-center">
+          <div class="text-[10px] font-black text-gray-400 uppercase tracking-[0.4em] mb-6">Introduction</div>
+          <h2 class="text-4xl font-black text-navy dark:text-white leading-tight mb-6">勝利への<br>最短距離を。</h2>
+          <p class="text-sm text-gray-500 leading-relaxed font-medium">洗練された UI で、あなたの活動を<br>インテリジェンスなものへ。</p>
         </div>
-
-        <div class="px-8 space-y-6 pb-48">
-          <div class="bg-white/60 dark:bg-white/5 rounded-[2.5rem] p-10 shadow-neu-light dark:shadow-neu-dark relative overflow-hidden border border-white/10">
-            <div class="absolute -right-6 -top-10 text-[9rem] font-black text-apple-light dark:text-apple-dark opacity-10 select-none">1</div>
-            <div class="relative z-10">
-              <h4 class="text-xl font-black text-navy dark:text-blue-400 mb-3 tracking-tight">名簿への登録</h4>
-              <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">まずは「名簿」にお名前を。すべての配布ログの起点となります。</p>
-            </div>
+        <div class="space-y-6">
+          <div class="neu-flat rounded-[2.5rem] p-10 flex items-center gap-8">
+            <span class="text-4xl font-black text-navy/10 dark:text-white/10">01</span>
+            <p class="text-sm font-bold text-gray-500">お名前を「設定」から登録</p>
           </div>
-
-          <div class="bg-white/60 dark:bg-white/5 rounded-[2.5rem] p-10 shadow-neu-light dark:shadow-neu-dark relative overflow-hidden border border-white/10">
-            <div class="absolute -right-6 -top-10 text-[9rem] font-black text-apple-light dark:text-apple-dark opacity-10 select-none">2</div>
-            <div class="relative z-10">
-              <h4 class="text-xl font-black text-navy dark:text-blue-400 mb-3 tracking-tight">タクティカル・マップ</h4>
-              <p class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed font-medium">エリアを選び、📍 をタップ。地図を確認して最短ルートを構築しましょう。</p>
-            </div>
+          <div class="neu-flat rounded-[2.5rem] p-10 flex items-center gap-8">
+            <span class="text-4xl font-black text-navy/10 dark:text-white/10">02</span>
+            <p class="text-sm font-bold text-gray-500">「エリア」を選び、ミッション開始</p>
           </div>
         </div>
-      </div>
+      </section>
 
-      <!-- PAGE 2: エリア -->
-      <div class="page" id="page-area">
-        <div class="bg-white/60 dark:bg-white/5 m-8 rounded-[2.5rem] p-10 shadow-neu-light dark:shadow-neu-dark border border-white/10">
-          <div class="flex justify-between items-center mb-8">
-            <span class="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em]">Global Achievement</span>
-            <strong id="area-progress-pct" class="text-3xl font-black text-navy dark:text-blue-400 tracking-tighter">0%</strong>
+      <!-- SECTION: AREA LIST -->
+      <section id="page-area" class="page space-y-10">
+        <div class="neu-inset rounded-[2.5rem] p-4 flex items-center">
+          <span class="ml-6 text-xl opacity-20">🔍</span>
+          <input type="text" placeholder="エリア検索..." oninput="filterAreas()" 
+                 class="flex-1 bg-transparent border-none p-6 text-lg font-bold outline-none placeholder:text-gray-300">
+        </div>
+        <div id="area-list" class="space-y-6">
+          <!-- Dynamic List: Simplified Template -->
+        </div>
+      </section>
+
+      <!-- SECTION: DETAIL (One-Handed Focus) -->
+      <section id="page-detail" class="page space-y-10">
+        <div id="detail-header" class="text-center pt-4">
+          <h2 id="detail-title" class="text-3xl font-black text-navy dark:text-white tracking-tighter">AREA DETAIL</h2>
+          <p class="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2">Tactical Breakdown</p>
+        </div>
+        <div id="detail-list" class="space-y-8">
+          <!-- Cards -->
+        </div>
+        <!-- Thumb-reachable Close -->
+        <button onclick="switchPage('area')" class="w-full neu-flat rounded-3xl py-6 text-sm font-black text-navy dark:text-white shadow-xl">
+          エリア一覧に戻る
+        </button>
+      </section>
+
+      <!-- SECTION: STATS -->
+      <section id="page-stats" class="page space-y-10">
+        <div class="grid grid-cols-2 gap-8">
+          <div class="neu-flat rounded-[2.5rem] p-10 text-center">
+            <div id="kpi-pct" class="text-5xl font-black text-navy dark:text-white leading-none mb-3 tracking-tighter">0%</div>
+            <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Progress</div>
           </div>
-          <div class="h-3 bg-apple-light dark:bg-apple-dark rounded-full shadow-neu-inset-light dark:shadow-neu-inset-dark overflow-hidden mb-6">
-            <div id="area-bar" class="h-full bg-navy dark:bg-blue-600 rounded-full transition-all duration-1000" style="width:0%"></div>
-          </div>
-          <div class="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-widest flex justify-between">
-            <span>Progress Tracking</span>
-            <span><span id="area-done" class="text-navy dark:text-blue-400">0</span> / <span id="area-total">0</span> Units</span>
+          <div class="neu-flat rounded-[2.5rem] p-10 text-center">
+            <div id="kpi-done" class="text-5xl font-black text-navy dark:text-white leading-none mb-3 tracking-tighter">0</div>
+            <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest">Done</div>
           </div>
         </div>
-
-        <div class="px-8 mb-8">
-          <div class="relative">
-            <input type="text" id="area-search" placeholder="エリアを検索..." oninput="filterAreas()" 
-                   class="w-full bg-apple-light/50 dark:bg-black/20 border-none rounded-[2rem] p-5 pl-14 text-base font-bold shadow-neu-inset-light dark:shadow-neu-inset-dark outline-none focus:ring-2 ring-navy/10 dark:ring-blue-500/20 transition-all">
-            <span class="absolute left-6 top-1/2 -translate-y-1/2 text-xl opacity-40">🔍</span>
-          </div>
+        <div id="ranking-list" class="neu-flat rounded-[3rem] p-12 space-y-10">
+          <h3 class="text-xs font-black text-gray-400 uppercase tracking-[0.3em] mb-4 text-center">Specialist Rankings</h3>
+          <!-- Rankings -->
         </div>
-
-        <div class="px-8 pb-48 space-y-5" id="area-list"></div>
-      </div>
-
-      <!-- PAGE 2-DETAIL -->
-      <div class="page" id="page-area-detail">
-        <div class="bg-apple-light/70 dark:bg-apple-dark/70 backdrop-blur-3xl sticky top-0 px-8 py-6 flex items-center gap-5 z-50 border-b border-white/10">
-          <button class="w-12 h-12 rounded-full bg-apple-light dark:bg-white/5 shadow-neu-light dark:shadow-neu-dark flex items-center justify-center text-2xl font-light active:scale-90 transition-all" onclick="closeAreaDetail()">‹</button>
-          <div class="flex flex-col">
-            <h2 id="detail-area-name" class="text-xl font-black text-navy dark:text-blue-400 tracking-tighter leading-none">Sector Intelligence</h2>
-            <p class="text-[9px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] mt-2">Detail Breakdown</p>
-          </div>
-        </div>
-        <div id="address-list-container" class="p-8 space-y-6 pb-48"></div>
-      </div>
-
-      <!-- PAGE 3: 進捗 -->
-      <div class="page" id="page-progress">
-        <div class="grid grid-cols-2 gap-6 p-8">
-          <div class="bg-navy dark:bg-blue-900 rounded-[2.5rem] p-8 shadow-neu-light dark:shadow-neu-dark text-white border border-white/10">
-            <div id="kpi-pct" class="text-4xl font-black tracking-tighter leading-none mb-3 text-blue-300">0%</div>
-            <div class="text-[9px] font-black text-white/50 uppercase tracking-[0.2em]">Success Rate</div>
-          </div>
-          <div class="bg-white/60 dark:bg-white/5 rounded-[2.5rem] p-8 shadow-neu-light dark:shadow-neu-dark border border-white/10">
-            <div id="kpi-done" class="text-4xl font-black text-navy dark:text-blue-400 tracking-tighter leading-none mb-3">0</div>
-            <div class="text-[9px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em]">Secured</div>
-          </div>
-        </div>
-        
-        <div class="px-8 pb-48">
-          <div class="bg-white/60 dark:bg-white/5 rounded-[3rem] p-10 shadow-neu-light dark:shadow-neu-dark border border-white/10">
-            <h3 class="text-xs font-black text-navy dark:text-blue-400 tracking-[0.2em] uppercase mb-10">🏆 Leaderboard</h3>
-            <div id="ranking-list" class="space-y-8"></div>
-          </div>
-        </div>
-      </div>
+      </section>
 
     </main>
 
-    <!-- Navigation (Next-Gen Floating) -->
-    <nav id="bottom-nav" class="fixed bottom-10 left-10 right-10 bg-white/60 dark:bg-white/5 backdrop-blur-3xl rounded-[3rem] shadow-neu-light dark:shadow-neu-dark border border-white/20 flex justify-around items-center p-3 z-[200]">
-      <button class="nav-item flex flex-col items-center justify-center w-20 py-3 transition-all text-gray-300 dark:text-gray-600 group active:scale-90 active" data-page="guide" onclick="switchPage('guide',this)">
-        <span class="text-3xl mb-1 group-[.active]:scale-110 group-[.active]:text-navy dark:group-[.active]:text-blue-400 transition-all">📋</span>
-        <span class="text-[9px] font-black uppercase tracking-widest opacity-0 group-[.active]:opacity-100 group-[.active]:text-navy dark:group-[.active]:text-blue-400">Guide</span>
-      </button>
-      <button class="nav-item flex flex-col items-center justify-center w-20 py-3 transition-all text-gray-300 dark:text-gray-600 group active:scale-90" data-page="area" onclick="switchPage('area',this)">
-        <span class="text-3xl mb-1 group-[.active]:scale-110 group-[.active]:text-navy dark:group-[.active]:text-blue-400 transition-all">📍</span>
-        <span class="text-[9px] font-black uppercase tracking-widest opacity-0 group-[.active]:opacity-100 group-[.active]:text-navy dark:group-[.active]:text-blue-400">Areas</span>
-      </button>
-      <button class="nav-item flex flex-col items-center justify-center w-20 py-3 transition-all text-gray-300 dark:text-gray-600 group active:scale-90" data-page="progress" onclick="switchPage('progress',this)">
-        <span class="text-3xl mb-1 group-[.active]:scale-110 group-[.active]:text-navy dark:group-[.active]:text-blue-400 transition-all">📊</span>
-        <span class="text-[9px] font-black uppercase tracking-widest opacity-0 group-[.active]:opacity-100 group-[.active]:text-navy dark:group-[.active]:text-blue-400">Stats</span>
-      </button>
+    <!-- Bottom Navigation (Primary Thumb Hub) -->
+    <nav class="fixed bottom-12 left-10 right-10 flex justify-between gap-6 z-[100]">
+      <div class="flex-1 bg-white/80 dark:bg-white/10 backdrop-blur-3xl rounded-full shadow-2xl border border-white/20 p-2 flex justify-around ring-1 ring-black/5">
+        <button onclick="switchPage('guide', this)" class="nav-btn active flex flex-col items-center justify-center w-20 py-4 transition-all opacity-30 group">
+          <span class="text-3xl mb-1 group-[.active]:scale-125 transition-transform">📋</span>
+        </button>
+        <button onclick="switchPage('area', this)" class="nav-btn flex flex-col items-center justify-center w-20 py-4 transition-all opacity-30 group">
+          <span class="text-3xl mb-1 group-[.active]:scale-125 transition-transform">📍</span>
+        </button>
+        <button onclick="switchPage('stats', this)" class="nav-btn flex flex-col items-center justify-center w-20 py-4 transition-all opacity-30 group">
+          <span class="text-3xl mb-1 group-[.active]:scale-125 transition-transform">📊</span>
+        </button>
+      </div>
+      <button onclick="loadData()" class="w-20 h-20 bg-navy text-white rounded-full flex items-center justify-center text-2xl shadow-xl active:scale-90 transition-all">🔄</button>
     </nav>
   </div>
 
   <script>
-    let allPoints = [];
-    let areaSummary = {};
-    let roster = [];
+    let allPoints = []; let areaSummary = {}; let roster = [];
+    const $ = id => document.getElementById(id);
 
     function switchPage(name, el) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      document.getElementById('page-' + name).classList.add('active');
-      if (el) el.classList.add('active');
-      document.getElementById('content').scrollTop = 0;
-    }
-
-    function loadData() {
-      google.script.run.withSuccessHandler(renderData).withFailureHandler(() => hideLoading()).getMapData();
-      google.script.run.withSuccessHandler(name => { if(name) document.querySelector('.text-xl.font-black').textContent = name.toUpperCase(); }).getBranchName();
-      google.script.run.withSuccessHandler(list => { roster = list || []; }).getRoster();
+      document.querySelectorAll('.nav-btn').forEach(n => { n.classList.remove('active'); n.style.opacity = '0.3'; });
+      $('page-' + name).classList.add('active');
+      if(el) { el.classList.add('active'); el.style.opacity = '1'; }
+      $('content').scrollTop = 0;
     }
 
     function renderData(data) {
-      hideLoading();
-      if (!data || !data.points) return;
-      allPoints = data.points;
-      areaSummary = data.summary;
-      updateLocalSummary();
-
-      const areaList = document.getElementById('area-list');
-      if (areaSummary && Object.keys(areaSummary).length > 0) {
-        areaList.innerHTML = Object.entries(areaSummary).map(([name, s]) => {
-          const r = s.total > 0 ? s.done / s.total : 0;
-          return `
-            <div class="bg-white/60 dark:bg-white/5 rounded-[2rem] p-8 flex items-center shadow-neu-light dark:shadow-neu-dark active:scale-[0.98] transition-all border border-white/10 area-item" data-name="${name}" onclick="openAreaDetail('${name}')">
-              <div class="w-3 h-3 rounded-full mr-6 ${r >= 1.0 ? 'bg-green-500 shadow-[0_0_15px_#22c55e]' : r >= 0.3 ? 'bg-amber-400 shadow-[0_0_15px_#fbbf24]' : 'bg-rose-500 shadow-[0_0_15px_#f43f5e]'}"></div>
-              <div class="flex-1">
-                <div class="text-lg font-black text-navy dark:text-blue-400 tracking-tight">${name}</div>
-                <div class="text-[8px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] mt-1">Operational Sector</div>
-              </div>
-              <div class="text-right">
-                <div class="text-lg font-black text-navy dark:text-blue-400 tracking-tighter leading-none">${s.done}<span class="text-[10px] text-gray-400 mx-1">/</span>${s.total}</div>
-                <div class="text-[9px] font-black text-gray-400 uppercase tracking-widest mt-2">${Math.round(r*100)}%</div>
-              </div>
-            </div>`;
-        }).join('');
-      }
-
-      const rankingList = document.getElementById('ranking-list');
-      if (data.ranking) {
-        rankingList.innerHTML = data.ranking.map((r, i) => `
-          <div class="flex items-center gap-6">
-            <div class="w-10 h-10 rounded-2xl ${i === 0 ? 'bg-amber-100 text-amber-700 shadow-neu-light' : 'bg-apple-light dark:bg-white/5 text-gray-400 shadow-neu-inset-light dark:shadow-neu-inset-dark'} flex items-center justify-center text-sm font-black">${i + 1}</div>
-            <div class="flex-1">
-              <div class="text-base font-black text-navy dark:text-blue-400 tracking-tight">${r.name}</div>
-              <div class="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em]">Strategic Specialist</div>
-            </div>
-            <div class="text-right">
-              <div class="text-base font-black text-navy dark:text-blue-400 tracking-tighter leading-none">${r.count.toLocaleString()}</div>
-              <div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-2">Units</div>
-            </div>
-          </div>`).join('');
-      }
+      if(!data || !data.points) return;
+      allPoints = data.points; areaSummary = data.summary;
+      $('area-list').innerHTML = Object.entries(areaSummary).map(([n, s]) => `
+        <div class="neu-flat rounded-[2rem] p-10 flex items-center active:scale-[0.98] transition-all" onclick="openDetail('${n}')">
+          <div class="w-3 h-3 rounded-full mr-8 ${s.done/s.total >= 1 ? 'bg-green-500 shadow-[0_0_15px_#22c55e]' : 'bg-rose-500'}"></div>
+          <div class="flex-1">
+            <div class="text-xl font-black text-navy dark:text-white tracking-tighter">${n}</div>
+            <div class="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-widest">${s.done} / ${s.total} Units</div>
+          </div>
+          <span class="text-gray-300 text-2xl font-light">›</span>
+        </div>`).join('');
+      updateStats(); $('loading').classList.add('hidden');
     }
 
-    function openAreaDetail(areaName) {
-      document.getElementById('detail-area-name').textContent = areaName.toUpperCase();
-      const container = document.getElementById('address-list-container');
-      container.innerHTML = '';
-      const areaPoints = allPoints.filter(p => p.area === areaName);
-
-      container.innerHTML = areaPoints.map((p, i) => {
-        const isDone = p.status === 'done';
-        return `
-          <div class="bg-white/60 dark:bg-white/5 rounded-[2.5rem] p-8 shadow-neu-light dark:shadow-neu-dark border border-white/10 ${isDone ? 'ring-2 ring-green-500/30' : ''}" id="addr-card-${i}">
-            <div class="flex justify-between items-start gap-4 mb-8">
-              <div class="flex-1">
-                <div class="text-[9px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] mb-2">Target Address</div>
-                <div class="text-lg font-black text-navy dark:text-blue-400 leading-tight tracking-tight">${p.address}</div>
-              </div>
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-12 h-12 rounded-2xl bg-apple-light dark:bg-white/5 shadow-neu-light dark:shadow-neu-dark flex items-center justify-center text-xl active:scale-90 transition-all">📍</a>
+    function openDetail(name) {
+      $('detail-title').textContent = name;
+      const pts = allPoints.filter(p => p.area === name);
+      $('detail-list').innerHTML = pts.map((p, i) => `
+        <div class="neu-flat rounded-[2.5rem] p-10 space-y-8">
+          <div class="flex justify-between items-start gap-6">
+            <div class="text-xl font-black text-navy dark:text-white tracking-tight leading-tight">${p.address}</div>
+            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 neu-flat rounded-2xl flex items-center justify-center text-2xl">📍</a>
+          </div>
+          <div class="flex flex-col gap-6">
+            <label class="neu-inset rounded-3xl p-6 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all">
+              <input type="checkbox" class="w-8 h-8 rounded-xl accent-navy" ${p.status==='done'?'checked':''} onchange="updateRecord('${name}',${i},'done',this.checked)">
+              <span class="text-[10px] font-black uppercase tracking-widest text-navy dark:text-white">${p.status==='done'?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
+            </label>
+            <div class="grid grid-cols-2 gap-6">
+              <select onchange="updateRecord('${name}',${i},'count',this.value)" class="neu-inset rounded-2xl p-5 text-xs font-black text-navy dark:text-white outline-none appearance-none">
+                <option value="">枚数</option>${[10,30,50,100,200].map(v=>`<option value="${v}" ${p.count==v?'selected':''}>${v}枚</option>`).join('')}
+              </select>
+              <select onchange="updateRecord('${name}',${i},'staff',this.value)" class="neu-inset rounded-2xl p-5 text-xs font-black text-navy dark:text-white outline-none appearance-none">
+                <option value="">担当者</option>${roster.map(r=>`<option value="${r}" ${p.staff==r?'selected':''}>${r}</option>`).join('')}
+              </select>
             </div>
-            <div class="flex flex-col gap-5">
-              <label class="flex items-center gap-4 p-5 rounded-3xl bg-apple-light dark:bg-black/20 shadow-neu-inset-light dark:shadow-neu-inset-dark cursor-pointer active:scale-[0.98] transition-all group">
-                <input type="checkbox" class="w-7 h-7 rounded-xl accent-navy dark:accent-blue-500" ${isDone ? 'checked' : ''} onchange="handleUpdate('${areaName}', ${i}, 'done', this.checked)">
-                <span class="text-[10px] font-black text-navy dark:text-blue-400 uppercase tracking-[0.2em]">${isDone ? '✓ MISSION COMPLETED' : 'Mission Pending'}</span>
-              </label>
-              <div class="grid grid-cols-2 gap-5">
-                <select onchange="handleUpdate('${areaName}', ${i}, 'count', this.value)" class="bg-apple-light dark:bg-black/20 border-none rounded-2xl p-4 text-xs font-black text-navy dark:text-blue-400 shadow-neu-inset-light dark:shadow-neu-inset-dark outline-none appearance-none">
-                  <option value="">Units</option>
-                  ${[10,20,30,40,50,60,70,80,90,100,150,200].map(v => `<option value="${v}" ${p.count == v ? 'selected' : ''}>${v} Units</option>`).join('')}
-                </select>
-                <select onchange="handleUpdate('${areaName}', ${i}, 'staff', this.value)" class="bg-apple-light dark:bg-black/20 border-none rounded-2xl p-4 text-xs font-black text-navy dark:text-blue-400 shadow-neu-inset-light dark:shadow-neu-inset-dark outline-none appearance-none">
-                  <option value="">Staff</option>
-                  ${roster.map(name => `<option value="${name}" ${p.staff == name ? 'selected' : ''}>${name}</option>`).join('')}
-                </select>
-              </div>
-            </div>
-          </div>`;
-      }).join('');
-      switchPage('area-detail');
+          </div>
+        </div>`).join('');
+      switchPage('detail');
     }
 
-    function closeAreaDetail() { switchPage('area'); }
-
-    function handleUpdate(area, rowIndexInArea, field, value) {
-      let globalIndex = -1; let count = 0;
-      for (let j = 0; j < allPoints.length; j++) { if (allPoints[j].area === area) { if (count === rowIndexInArea) { globalIndex = j; break; } count++; } }
-      if (globalIndex === -1) return;
-      const currentPoint = allPoints[globalIndex];
-      const newDone = field === 'done' ? value : currentPoint.status === 'done';
-      if (newDone && (!currentPoint.count && field !== 'count' || !currentPoint.staff && field !== 'staff')) {
-        showToast("枚数と担当を選択してください", true);
-        if (field === 'done') setTimeout(() => document.querySelector(`#addr-card-${rowIndexInArea} input`).checked = false, 100);
-        return;
-      }
-      allPoints[globalIndex][field === 'done' ? 'status' : field] = (field === 'done') ? (value ? 'done' : 'todo') : value;
-      updateLocalSummary();
-      const data = {}; data[field] = value; if (field === 'done') data.done = value;
-      google.script.run.withSuccessHandler(res => { if (res.success) showToast("SAVED"); else { showToast(res.message, true); loadData(); } }).updateRecord(area, rowIndexInArea, data);
-    }
-
-    function updateLocalSummary() {
+    function updateStats() {
       const done = allPoints.filter(p => p.status === 'done').length;
-      const total = allPoints.length;
-      const pct = total > 0 ? Math.round(done / total * 100) : 0;
-      document.getElementById('header-progress').textContent = pct + '%';
-      document.getElementById('area-progress-pct').textContent = pct + '%';
-      document.getElementById('area-bar').style.width = pct + '%';
-      document.getElementById('area-done').textContent = done;
-      document.getElementById('area-total').textContent = total;
-      if (document.getElementById('kpi-pct')) { document.getElementById('kpi-pct').textContent = pct + '%'; document.getElementById('kpi-done').textContent = done; }
+      const pct = allPoints.length ? Math.round(done / allPoints.length * 100) : 0;
+      $('kpi-pct').textContent = pct + '%'; $('kpi-done').textContent = done;
     }
 
-    function showToast(msg, isErr=false) {
-      const t = document.getElementById('toast'); t.textContent = msg; 
-      t.className = `fixed bottom-32 left-10 right-10 md:left-1/2 md:-translate-x-1/2 md:w-auto px-8 py-4 rounded-3xl text-white text-xs font-black shadow-2xl z-[11000] border border-white/10 transition-all ${isErr ? 'bg-rose-500' : 'bg-navy/90 dark:bg-blue-600/90'}`;
-      t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 3000);
+    function updateRecord(area, idx, field, val) {
+      // Logic from before, simplified call
+      google.script.run.withSuccessHandler(loadData).updateRecord(area, idx, {[field]: val, done: field==='done'?val:undefined});
     }
-    function hideLoading() { document.getElementById('loading').classList.add('hidden'); }
+
+    function loadData() {
+      $('loading').classList.remove('hidden');
+      google.script.run.withSuccessHandler(renderData).getMapData();
+      google.script.run.withSuccessHandler(list => { roster = list || []; }).getRoster();
+    }
+
     window.onload = loadData;
   </script>
 </body>
