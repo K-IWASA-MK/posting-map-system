@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>POSTING MAP PRO</title>
+  <title>POSTING MAP</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=100">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
@@ -25,23 +25,18 @@
     body { -webkit-tap-highlight-color: transparent; }
     .safe-top { padding-top: env(safe-area-inset-top); }
     .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .page { display: block; opacity: 1; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
-    .page.hidden { display: none; opacity: 0; }
+    .btn-neu { @apply transition-all duration-300 active:scale-95; }
     .neu-flat { @apply bg-white dark:bg-[#1c1c1e] shadow-[8px_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.4)]; }
     .neu-inset { @apply bg-gray-50 dark:bg-black/20 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5)]; }
-    .btn-neu { @apply transition-all duration-300 active:scale-95; }
   </style>
 </head>
 <body class="bg-apple-light dark:bg-apple-dark text-[#1d1d1f] dark:text-[#f5f5f7] font-sans antialiased overflow-hidden select-none">
-
-  <!-- 1. GATEWAY SCREEN (Shown on GitHub) -->
-  <div id="screen-gateway" class="fixed inset-0 z-[1000] bg-apple-light dark:bg-apple-dark hidden flex flex-col items-center justify-center pt-32 pb-40 px-10 text-center">
+  <div id="screen-gateway" class="fixed inset-0 z-[1000] bg-apple-light dark:bg-apple-dark flex flex-col items-center justify-center pt-32 pb-40 px-10 text-center">
     <div class="fixed top-0 left-0 right-0 px-10 py-10 flex justify-between items-center z-[1001]">
       <h1 class="text-3xl font-black tracking-tighter text-navy dark:text-white leading-none">POSTING MAP</h1>
-      <div class="bg-white/60 dark:bg-white/10 px-5 py-2.5 rounded-full flex items-center gap-4 shadow-neu-inset-light dark:shadow-neu-inset-dark">
-        <div class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></div>
-        <span class="text-xs font-black text-navy dark:text-blue-400 tracking-tighter">0%</span>
+      <div class="bg-white/60 dark:bg-white/10 px-5 py-2.5 rounded-full flex items-center gap-4 shadow-neu-inset-light dark:shadow-neu-inset-dark text-xs font-black">
+        <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+        <span>0%</span>
       </div>
     </div>
     <div class="flex flex-col items-center justify-center mb-8 mt-10">
@@ -57,159 +52,9 @@
       <p class="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.3em]">Operational Environment</p>
     </div>
   </div>
-
-  <!-- 2. LOADING OVERLAY -->
-  <div id="loading" class="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-apple-light dark:bg-apple-dark transition-opacity duration-700">
-    <div class="w-12 h-12 border-[3px] border-navy/10 dark:border-white/10 border-t-navy dark:border-t-white rounded-full animate-spin"></div>
-  </div>
-
-  <!-- 3. MAIN APP (Shown on GAS) -->
-  <div id="app" class="flex flex-col h-screen overflow-hidden opacity-0 transition-opacity duration-1000 hidden">
-    <header class="safe-top px-10 py-10 flex justify-between items-center">
-      <h1 class="text-3xl font-black tracking-tighter text-navy dark:text-white leading-none">POSTING MAP</h1>
-      <div class="bg-white/60 dark:bg-white/10 px-5 py-2.5 rounded-full flex items-center gap-4 shadow-neu-inset-light dark:shadow-neu-inset-dark">
-        <div id="sync-status" class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></div>
-        <span id="header-pct" class="text-xs font-black text-navy dark:text-blue-400 tracking-tighter">0%</span>
-      </div>
-    </header>
-
-    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-10 space-y-12 pb-48">
-      <section id="page-areas" class="page space-y-10">
-        <div id="area-list" class="space-y-8"></div>
-      </section>
-      <section id="page-detail" class="page hidden space-y-10">
-        <div class="flex items-center gap-4 mb-4">
-          <button onclick="switchPage('areas')" class="w-12 h-12 neu-flat rounded-2xl flex items-center justify-center text-xl">‹</button>
-          <h2 id="detail-title" class="text-2xl font-black text-navy dark:text-white tracking-tighter truncate">Area Detail</h2>
-        </div>
-        <div id="detail-list" class="space-y-10 pb-20"></div>
-      </section>
-      <section id="page-settings" class="page hidden space-y-10">
-        <div class="neu-flat rounded-[3rem] p-12 text-center shadow-2xl">
-          <h2 class="text-3xl font-black text-navy dark:text-white leading-tight mb-10">お名前を登録して<br>ください</h2>
-          <div class="space-y-10 text-left">
-            <div>
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4 ml-2">苗字</label>
-              <input type="text" id="user-last" class="neu-inset w-full rounded-2xl p-6 text-lg font-black text-navy dark:text-white outline-none" placeholder="例：鈴木">
-            </div>
-            <div>
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4 ml-2">名前</label>
-              <input type="text" id="user-first" class="neu-inset w-full rounded-2xl p-6 text-lg font-black text-navy dark:text-white outline-none" placeholder="例：一郎">
-            </div>
-            <button onclick="saveProfile()" class="btn-neu w-full bg-navy dark:bg-blue-600 text-white rounded-2xl py-6 text-xl font-black shadow-xl">登録を完了する</button>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <nav class="fixed bottom-10 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
-      <div class="bg-white/60 dark:bg-black/60 backdrop-blur-3xl rounded-[3.5rem] p-4 shadow-neu-light dark:shadow-neu-dark border border-white/20 flex justify-around items-center h-28 relative">
-        <button onclick="switchPage('areas')" class="nav-btn flex flex-col items-center gap-2 flex-1"><div class="text-2xl">📍</div><span class="text-[9px] font-black uppercase tracking-widest">Areas</span></button>
-        <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-2 flex-1"><div class="text-2xl">⚙️</div><span class="text-[9px] font-black uppercase tracking-widest">Auth</span></button>
-      </div>
-    </nav>
-  </div>
-
   <script>
-    const $ = id => document.getElementById(id);
-    let allPoints = [], areaSummary = [], roster = [];
-    
-    // 環境判定
-    const isGAS = window.location.hostname.includes('google.com') || window.location.href.includes('?page=');
     const GAS_URL = "https://script.google.com/macros/s/AKfycbyA-VSYqJ_54FWoEhi3XfE5GXyN3WHUZrD2heRBrCrQOw2WTW4utXYk6nReMmjDJfOY/exec?page=app";
-
-    function initEnvironment() {
-      if (isGAS) {
-        $('screen-gateway').classList.add('hidden');
-        $('app').classList.remove('hidden');
-        loadData();
-      } else {
-        $('screen-gateway').classList.remove('hidden');
-        $('app').classList.add('hidden');
-        $('loading').classList.add('hidden');
-      }
-    }
-
     function forceStart() { window.location.href = GAS_URL; }
-
-    function switchPage(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      $(id === 'detail' ? 'page-detail' : (id === 'settings' ? 'page-settings' : 'page-areas')).classList.remove('hidden');
-      document.querySelectorAll('.nav-btn').forEach((b, i) => { b.style.opacity = (id === 'areas' && i === 0) || (id === 'settings' && i === 1) ? '1' : '0.3'; });
-      $('content').scrollTo(0,0);
-    }
-
-    function renderData(data) {
-      if(!data || !data.points) return;
-      allPoints = data.points; areaSummary = data.summary || [];
-      $('area-list').innerHTML = areaSummary.map(s => `
-        <div class="neu-flat rounded-[2.5rem] p-10 flex items-center active:scale-[0.98] transition-all" onclick="openDetail('${s.name}')">
-          <div class="w-3 h-3 rounded-full mr-8 ${s.done/s.total >= 1 ? 'bg-green-500 shadow-[0_0_15px_#22c55e]' : 'bg-rose-500'}"></div>
-          <div class="flex-1">
-            <div class="text-xl font-black text-navy dark:text-white tracking-tighter">${s.name}</div>
-            <div class="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-widest">${s.done} / ${s.total} Units</div>
-          </div>
-          <span class="text-gray-300 text-2xl font-light">›</span>
-        </div>`).join('');
-      updateStats(); 
-      const saved = localStorage.getItem('user_info');
-      switchPage(saved ? 'areas' : 'settings');
-      setTimeout(() => { $('app').classList.remove('opacity-0'); $('loading').classList.add('opacity-0'); setTimeout(() => $('loading').classList.add('hidden'), 700); }, 1000);
-    }
-
-    function openDetail(name) {
-      $('detail-title').textContent = name;
-      const pts = allPoints.filter(p => p.area === name);
-      $('detail-list').innerHTML = pts.map((p, i) => `
-        <div class="neu-flat rounded-[2.5rem] p-10 space-y-8">
-          <div class="flex justify-between items-start gap-6">
-            <div class="text-xl font-black text-navy dark:text-white tracking-tight leading-tight">${p.address}</div>
-            <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 neu-flat rounded-2xl flex items-center justify-center text-2xl">📍</a>
-          </div>
-          <div class="flex flex-col gap-6">
-            <label class="neu-inset rounded-3xl p-6 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all">
-              <input type="checkbox" class="w-8 h-8 rounded-xl accent-navy" ${p.status==='done'?'checked':''} onchange="updateRecord('${name}',${i},'done',this.checked)">
-              <span class="text-[10px] font-black uppercase tracking-widest text-navy dark:text-white">${p.status==='done'?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
-            </label>
-            <div class="grid grid-cols-2 gap-6">
-              <select onchange="updateRecord('${name}',${i},'count',this.value)" class="neu-inset rounded-2xl p-5 text-xs font-black text-navy dark:text-white outline-none appearance-none">
-                <option value="">枚数</option>${[10,30,50,100,200].map(v=>`<option value="${v}" ${p.count==v?'selected':''}>${v}枚</option>`).join('')}
-              </select>
-              <select onchange="updateRecord('${name}',${i},'staff',this.value)" class="neu-inset rounded-2xl p-5 text-xs font-black text-navy dark:text-white outline-none appearance-none">
-                <option value="">担当者</option>${roster.map(r=>`<option value="${r}" ${p.staff==r?'selected':''}>${r}</option>`).join('')}
-              </select>
-            </div>
-          </div>
-        </div>`).join('');
-      switchPage('detail');
-    }
-
-    function updateStats() {
-      const done = allPoints.filter(p => p.status === 'done').length;
-      const pct = allPoints.length ? Math.round(done / allPoints.length * 100) : 0;
-      $('header-pct').textContent = pct + '%';
-    }
-
-    function updateRecord(area, idx, field, val) {
-      if (!isGAS) return;
-      google.script.run.withSuccessHandler(loadData).updateRecord(area, idx, {[field]: val, done: field==='done'?val:undefined});
-    }
-
-    function saveProfile() {
-      const last = $('user-last').value.trim(), first = $('user-first').value.trim();
-      if (!last || !first) { alert('姓名を入力してください'); return; }
-      localStorage.setItem('user_info', JSON.stringify({last, first}));
-      switchPage('areas');
-    }
-
-    function loadData() {
-      if (!isGAS) return;
-      $('loading').classList.remove('hidden');
-      google.script.run.withSuccessHandler(renderData).withFailureHandler(err => { alert('エラー: ' + err.message); $('loading').classList.add('hidden'); }).getAppData();
-      google.script.run.withSuccessHandler(list => { roster = list || []; }).getRoster();
-    }
-
-    window.onload = initEnvironment;
   </script>
 </body>
 </html>
