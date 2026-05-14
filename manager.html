@@ -3,35 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>MANAGER COMMAND NEXT</title>
+  <title>ADMIN DASHBOARD v2.0</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=100">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'media',
       theme: {
         extend: {
           colors: {
-            navy: {
-              DEFAULT: '#1a237e',
-              light: '#283593',
-              dark: '#0d1642'
-            },
-            apple: {
-              light: '#f5f5f7',
-              dark: '#000000'
-            }
+            navy: { DEFAULT: '#1a237e', light: '#283593', dark: '#0d1642' },
+            apple: { light: '#f5f5f7', dark: '#000000' }
           },
-          fontFamily: {
-            sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
-          },
-          boxShadow: {
-            'neu-light': '8px 8px 16px #d1d1d6, -8px -8px 16px #ffffff',
-            'neu-dark': '8px 8px 16px #000000, -4px -4px 12px #1c1c1e',
-            'neu-inset-light': 'inset 4px 4px 8px #d1d1d6, inset -4px -4px 8px #ffffff',
-            'neu-inset-dark': 'inset 4px 4px 8px #000000, inset -2px -2px 6px #1c1c1e',
-          }
+          fontFamily: { sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'] }
         }
       }
     }
@@ -41,184 +26,67 @@
     .safe-top { padding-top: env(safe-area-inset-top); }
     .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
     .hide-scrollbar::-webkit-scrollbar { display: none; }
-    @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    .animate-pulse-soft { animation: pulse-soft 3s ease-in-out infinite; }
-    
-    .glass-card { @apply bg-white/60 dark:bg-white/5 backdrop-blur-3xl border border-white/10 shadow-neu-light dark:shadow-neu-dark; }
+    .neu-flat { @apply bg-white dark:bg-[#1c1c1e] shadow-[8px_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.4)]; }
+    .neu-inset { @apply bg-gray-50 dark:bg-black/20 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5)]; }
+    .btn-neu { @apply transition-all duration-300 active:scale-95; }
   </style>
 </head>
-<body class="bg-apple-light dark:bg-apple-dark text-[#1d1d1f] dark:text-[#f5f5f7] font-sans antialiased overflow-x-hidden transition-colors duration-500">
+<body class="bg-apple-light dark:bg-apple-dark text-[#1d1d1f] dark:text-[#f5f5f7] font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
-  <!-- Admin Auth Overlay (Modern Glass) -->
-  <div id="auth-overlay" class="fixed inset-0 z-[10000] bg-apple-light dark:bg-apple-dark flex items-center justify-center px-10 safe-top safe-bottom transition-all duration-700">
-    <div class="w-full max-w-md bg-white/60 dark:bg-white/5 backdrop-blur-3xl rounded-[3rem] p-12 shadow-neu-light dark:shadow-neu-dark border border-white/10 text-center animate-fade-in">
-      <div class="w-20 h-20 bg-apple-light dark:bg-black/20 rounded-3xl shadow-neu-inset-light dark:shadow-neu-inset-dark flex items-center justify-center text-3xl mx-auto mb-10">🛡️</div>
-      <h2 class="text-2xl font-black text-navy dark:text-blue-400 tracking-tight mb-4">Command Auth</h2>
-      <p class="text-xs font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.3em] mb-10">Enter Strategy PIN</p>
-      
-      <div class="relative mb-10">
-        <input type="password" id="pin-input" maxlength="4" placeholder="••••" 
-               class="w-full bg-apple-light/50 dark:bg-black/20 border-none rounded-2xl py-6 text-center text-4xl tracking-[1em] font-black shadow-neu-inset-light dark:shadow-neu-inset-dark outline-none focus:ring-4 ring-navy/5 dark:ring-blue-500/10 transition-all placeholder:tracking-normal">
+  <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) -->
+  <div id="screen-gateway" class="fixed inset-0 z-[1000] bg-apple-light dark:bg-apple-dark flex flex-col items-center justify-center p-10 text-center">
+    <div class="flex flex-col items-center justify-center mb-6 mt-0">
+      <div class="w-44 h-44 bg-apple-light dark:bg-[#1c1c1e] rounded-[3.8rem] shadow-neu-light dark:shadow-neu-dark flex items-center justify-center overflow-hidden mb-6 p-1 relative">
+        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=100" class="w-full h-full object-cover rounded-[3.5rem] z-10">
       </div>
-      
-      <button onclick="checkPin()" class="w-full bg-navy dark:bg-blue-600 text-white rounded-[1.5rem] py-5 text-lg font-black shadow-xl active:scale-[0.98] transition-all">
-        AUTHENTICATE
-      </button>
+      <p class="text-gray-500 dark:text-gray-400 font-bold leading-relaxed text-sm">管理者専用の管理画面です。<br>ホーム画面に追加してご利用ください</p>
+    </div>
+    <div class="w-full max-w-sm space-y-4">
+      <div class="bg-white/40 dark:bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 shadow-neu-light dark:shadow-neu-dark border border-white/20">
+        <button onclick="startAdmin()" class="btn-neu w-full bg-navy dark:bg-blue-600 text-white rounded-2xl py-6 text-xl font-black shadow-xl uppercase tracking-tighter">管理画面を起動する</button>
+      </div>
+      <p class="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em] pt-4">Administrator Mode</p>
     </div>
   </div>
 
-  <div id="manager-app" class="hidden min-h-screen flex flex-col">
-    
-    <!-- Top Command Bar -->
-    <header class="bg-apple-light/70 dark:bg-apple-dark/70 backdrop-blur-3xl border-b border-white/10 safe-top z-50 sticky top-0">
-      <div class="px-10 py-8 flex justify-between items-center h-24 md:h-28">
-        <div class="flex items-center gap-5">
-          <div class="w-12 h-12 bg-navy dark:bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-lg shadow-navy/20">👑</div>
-          <div class="flex flex-col">
-            <h1 class="text-2xl font-black tracking-tighter text-navy dark:text-blue-400">MANAGER COMMAND</h1>
-            <p class="text-[9px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em] mt-1">Operational Intelligence</p>
-          </div>
-        </div>
-        <div class="flex gap-4">
-          <button onclick="location.reload()" class="w-12 h-12 bg-white/50 dark:bg-white/5 rounded-2xl shadow-neu-light dark:shadow-neu-dark flex items-center justify-center active:scale-90 transition-all">🔄</button>
-        </div>
-      </div>
+  <!-- 2. LOADING -->
+  <div id="loading" class="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-apple-light dark:bg-apple-dark transition-opacity duration-700 hidden">
+    <div class="w-12 h-12 border-[3px] border-navy/10 dark:border-white/10 border-t-navy dark:border-t-white rounded-full animate-spin"></div>
+    <p class="mt-6 text-[10px] font-black text-navy/40 dark:text-white/40 uppercase tracking-[0.3em] animate-pulse">Syncing Admin Data...</p>
+  </div>
+
+  <!-- 3. MAIN ADMIN APP (Placeholder for now) -->
+  <div id="app" class="fixed inset-0 z-[2000] flex flex-col bg-apple-light dark:bg-apple-dark opacity-0 transition-opacity duration-1000 hidden">
+    <header class="safe-top px-10 py-12 flex justify-between items-center">
+      <h1 class="text-3xl font-black tracking-tighter text-navy dark:text-white leading-none">ADMIN DASHBOARD</h1>
+      <button onclick="location.reload()" class="w-12 h-12 neu-flat rounded-2xl flex items-center justify-center text-xl">🔄</button>
     </header>
 
-    <main class="p-10 space-y-10 max-w-5xl mx-auto w-full pb-32">
-      
-      <!-- Summary Grid (Neumorphic Cards) -->
-      <section class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white/60 dark:bg-white/5 rounded-[2.5rem] p-10 shadow-neu-light dark:shadow-neu-dark border border-white/10 col-span-1 md:col-span-2 relative overflow-hidden group">
-          <div class="flex justify-between items-start relative z-10">
-            <div>
-              <div class="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] mb-4">Total Achievement</div>
-              <div id="stat-pct" class="text-6xl font-black text-navy dark:text-blue-400 tracking-tighter leading-none mb-4">0%</div>
-              <div class="h-2 w-48 bg-apple-light dark:bg-apple-dark rounded-full shadow-neu-inset-light dark:shadow-neu-inset-dark overflow-hidden">
-                <div id="stat-bar" class="h-full bg-navy dark:bg-blue-600 transition-all duration-1000" style="width:0%"></div>
-              </div>
-            </div>
-            <!-- Progress Ring -->
-            <div class="relative w-24 h-24 hidden sm:block">
-              <svg class="w-full h-full transform -rotate-90">
-                <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" class="text-apple-light dark:text-gray-900" />
-                <circle id="stat-ring" cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2" class="text-navy dark:text-blue-500 transition-all duration-1000" />
-              </svg>
-            </div>
-          </div>
-          <div class="absolute -right-10 -top-10 w-40 h-40 bg-blue-500/10 rounded-full blur-[80px]"></div>
-        </div>
-
-        <div class="bg-white/60 dark:bg-white/5 rounded-[2.5rem] p-10 shadow-neu-light dark:shadow-neu-dark border border-white/10 flex flex-col justify-center">
-          <div class="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em] mb-4">Units Secured</div>
-          <div id="stat-done" class="text-5xl font-black text-navy dark:text-blue-400 tracking-tighter leading-none mb-2">0</div>
-          <div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest leading-none">Global Coverage</div>
-        </div>
-      </section>
-
-      <!-- Area Matrix -->
-      <section>
-        <div class="flex justify-between items-end mb-8 px-4">
-          <div>
-            <h3 class="text-sm font-black text-navy dark:text-blue-400 uppercase tracking-[0.2em]">Strategic Sectors</h3>
-            <p class="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest mt-1">Real-time Area Intelligence</p>
-          </div>
-          <div id="area-count" class="text-xs font-black text-gray-400 dark:text-gray-600">0 Sectors</div>
-        </div>
-        
-        <div id="area-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Area Cards Dynamic -->
-        </div>
-      </section>
-
-      <!-- Performance Insights -->
-      <section class="bg-white/60 dark:bg-white/5 rounded-[3rem] p-12 shadow-neu-light dark:shadow-neu-dark border border-white/10">
-        <h3 class="text-sm font-black text-navy dark:text-blue-400 uppercase tracking-[0.2em] mb-12">🏆 Specialist Ranking</h3>
-        <div id="ranking-list" class="space-y-8">
-          <!-- Ranking Dynamic -->
-        </div>
-      </section>
-
+    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-10 space-y-12 pb-48">
+      <div class="neu-flat rounded-[3rem] p-12 text-center shadow-2xl">
+        <h2 class="text-3xl font-black text-navy dark:text-white leading-tight mb-6">管理機能準備中</h2>
+        <p class="text-gray-400 font-bold text-sm">API連携による戦略ダッシュボードを<br>順次展開します。</p>
+      </div>
     </main>
-
-    <footer class="p-10 text-center opacity-20 safe-bottom">
-      <p class="text-[10px] font-black text-navy dark:text-blue-400 uppercase tracking-[0.5em]">Next-Gen Command Infrastructure</p>
-    </footer>
   </div>
 
   <script>
-    const GAS_ENDPOINT = "https://script.google.com/macros/s/AKfycbyi8U3f3nQ2j0zS7B5x9vW1pZf9s9m_q9z/exec"; // Target for AJAX
+    const $ = id => document.getElementById(id);
+    const API_URL = "https://script.google.com/macros/s/AKfycbyA-VSYqJ_54FWoEhi3XfE5GXyN3WHUZrD2heRBrCrQOw2WTW4utXYk6nReMmjDJfOY/exec";
 
-    function checkPin() {
-      const pin = document.getElementById('pin-input').value;
-      if (pin === "2025") {
-        document.getElementById('auth-overlay').classList.add('opacity-0', 'pointer-events-none', 'scale-110');
+    function startAdmin() {
+      $('screen-gateway').classList.add('hidden');
+      $('loading').classList.remove('hidden');
+      
+      // Simulate data fetch
+      setTimeout(() => {
+        $('app').classList.remove('hidden');
         setTimeout(() => {
-          document.getElementById('auth-overlay').style.display = 'none';
-          document.getElementById('manager-app').classList.remove('hidden');
-          loadData();
-        }, 700);
-      } else {
-        alert("ACCESS DENIED");
-      }
-    }
-
-    function loadData() {
-      // Dummy logic for prototype demonstration
-      const data = {
-        stats: { done: 1254, total: 3000, pct: 42 },
-        areas: [
-          { name: "四日市市", done: 450, total: 1000, rate: 0.45 },
-          { name: "鈴鹿市", done: 800, total: 1000, rate: 0.8 },
-          { name: "亀山市", done: 4, total: 1000, rate: 0.004 }
-        ],
-        ranking: [
-          { name: "田中 健一", count: 450 },
-          { name: "佐藤 裕子", count: 320 },
-          { name: "鈴木 一郎", count: 280 }
-        ]
-      };
-      renderDashboard(data);
-    }
-
-    function renderDashboard(data) {
-      document.getElementById('stat-pct').innerText = data.stats.pct + "%";
-      document.getElementById('stat-bar').style.width = data.stats.pct + "%";
-      document.getElementById('stat-ring').style.strokeDashoffset = 251.2 - (251.2 * data.stats.pct / 100);
-      document.getElementById('stat-done').innerText = data.stats.done.toLocaleString();
-      document.getElementById('area-count').innerText = data.areas.length + " Sectors";
-
-      const grid = document.getElementById('area-grid');
-      grid.innerHTML = data.areas.map(a => `
-        <div class="bg-white/60 dark:bg-white/5 rounded-[2rem] p-8 shadow-neu-light dark:shadow-neu-dark border border-white/10 relative overflow-hidden">
-          <div class="flex justify-between items-start mb-6">
-            <h4 class="text-xl font-black text-navy dark:text-blue-400 tracking-tight">${a.name}</h4>
-            <span class="text-[10px] font-black px-3 py-1 rounded-full ${a.rate >= 0.8 ? 'bg-green-100 text-green-700' : a.rate >= 0.3 ? 'bg-amber-100 text-amber-700' : 'bg-rose-100 text-rose-700'}">${Math.round(a.rate*100)}%</span>
-          </div>
-          <div class="h-1.5 bg-apple-light dark:bg-apple-dark rounded-full shadow-neu-inset-light dark:shadow-neu-inset-dark overflow-hidden mb-4">
-            <div class="h-full ${a.rate >= 0.8 ? 'bg-green-500' : a.rate >= 0.3 ? 'bg-amber-400' : 'bg-rose-500'} transition-all duration-1000" style="width: ${a.rate*100}%"></div>
-          </div>
-          <div class="flex justify-between text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-widest">
-            <span>Progress</span>
-            <span>${a.done} / ${a.total}</span>
-          </div>
-        </div>
-      `).join('');
-
-      const ranking = document.getElementById('ranking-list');
-      ranking.innerHTML = data.ranking.map((r, i) => `
-        <div class="flex items-center gap-6 group">
-          <div class="w-12 h-12 rounded-2xl ${i === 0 ? 'bg-amber-100 text-amber-700 shadow-neu-light' : 'bg-apple-light dark:bg-white/5 text-gray-400 shadow-neu-inset-light dark:shadow-neu-inset-dark'} flex items-center justify-center text-sm font-black transition-transform group-hover:scale-110">${i + 1}</div>
-          <div class="flex-1">
-            <div class="text-lg font-black text-navy dark:text-blue-400 tracking-tight">${r.name}</div>
-            <div class="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-[0.2em]">Field Intelligence Specialist</div>
-          </div>
-          <div class="text-right">
-            <div class="text-lg font-black text-navy dark:text-blue-400 tracking-tighter leading-none">${r.count.toLocaleString()}</div>
-            <div class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-2">Units</div>
-          </div>
-        </div>
-      `).join('');
+          $('app').classList.remove('opacity-0');
+          $('loading').classList.add('opacity-0');
+          setTimeout(() => $('loading').classList.add('hidden'), 700);
+        }, 500);
+      }, 1000);
     }
   </script>
 </body>
