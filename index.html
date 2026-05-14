@@ -3,19 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>POSTING MAP PRO v2.0-API</title>
-  <!-- Cache Buster: v73 -->
+  <title>POSTING MAP PRO</title>
+  <!-- Cache Buster: v75 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=100">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
       darkMode: 'media',
       theme: {
         extend: {
           colors: {
-            navy: { DEFAULT: '#1a237e', light: '#283593', dark: '#0d1642' },
-            apple: { light: '#f5f5f7', dark: '#000000' }
+            brand: {
+              primary: '#2563eb', // Vibrant Blue
+              navy: '#1a237e',
+              dark: '#0a0a0a'
+            }
           },
           fontFamily: { sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'] }
         }
@@ -23,133 +26,167 @@
     }
   </script>
   <style>
-    body { -webkit-tap-highlight-color: transparent; }
-    .safe-top { padding-top: env(safe-area-inset-top); }
-    .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
-    .hide-scrollbar::-webkit-scrollbar { display: none; }
-    .page { display: block; opacity: 1; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
-    .page.hidden { display: none; opacity: 0; }
-    .neu-flat { @apply bg-white dark:bg-[#1c1c1e] shadow-[8px_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.4)]; }
-    .neu-inset { @apply bg-gray-50 dark:bg-black/20 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5)]; }
-    .btn-neu { @apply transition-all duration-300 active:scale-95; }
+    :root { --safe-top: env(safe-area-inset-top); --safe-bottom: env(safe-area-inset-bottom); }
+    body { -webkit-tap-highlight-color: transparent; background: #000; color: #fff; }
+    
+    /* プレミアム・ニューモーフィズム */
+    .neu-card { 
+      background: #121212;
+      box-shadow: 12px 12px 24px #080808, -8px -8px 16px #1c1c1c;
+      border-radius: 2rem;
+    }
+    .neu-inset {
+      background: #0a0a0a;
+      box-shadow: inset 6px 6px 12px #040404, inset -4px -4px 8px #101010;
+      border-radius: 1.5rem;
+    }
+    .btn-action {
+      background: linear-gradient(145deg, #2b2b2b, #111111);
+      box-shadow: 6px 6px 12px #050505, -4px -4px 8px #1d1d1d;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-action:active {
+      box-shadow: inset 4px 4px 8px #050505, inset -2px -2px 4px #1d1d1d;
+      transform: scale(0.97);
+    }
+    .btn-primary {
+      background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    }
+    
+    /* アニメーション */
+    .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    
+    .page-transition { transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .page-hidden { opacity: 0; transform: scale(0.95); pointer-events: none; visibility: hidden; position: absolute; }
+    
+    /* 巨大UI調整 */
+    .text-giant { font-size: 1.75rem; line-height: 1.2; font-weight: 900; }
+    .input-giant { font-size: 1.5rem; padding: 1.5rem; font-weight: 700; }
   </style>
 </head>
-<body class="bg-apple-light dark:bg-apple-dark text-[#1d1d1f] dark:text-[#f5f5f7] font-sans antialiased overflow-hidden select-none transition-colors duration-500">
+<body class="font-sans antialiased overflow-hidden select-none">
 
-  <!-- 1. GATEWAY / SPLASH -->
-  <div id="screen-gateway" class="fixed inset-0 z-[1000] bg-apple-light dark:bg-apple-dark flex flex-col items-center justify-center p-10 text-center">
-    <div class="flex flex-col items-center justify-center mb-6 mt-0">
-      <div class="w-44 h-44 bg-apple-light dark:bg-[#1c1c1e] rounded-[3.8rem] shadow-neu-light dark:shadow-neu-dark flex items-center justify-center overflow-hidden mb-6 p-1 relative">
-        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=100" class="w-full h-full object-cover rounded-[3.5rem] z-10">
-      </div>
-      <p class="text-gray-500 dark:text-gray-400 font-bold leading-relaxed text-sm">ホーム画面へ追加してから<br>アプリをご利用ください</p>
-    </div>
-    <div class="w-full max-w-sm space-y-4">
-      <div class="bg-white/40 dark:bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 shadow-neu-light dark:shadow-neu-dark border border-white/20">
-        <button onclick="startApp()" class="btn-neu w-full bg-navy dark:bg-blue-600 text-white rounded-2xl py-6 text-xl font-black shadow-xl uppercase tracking-tighter">アプリを起動する</button>
-      </div>
-      <p class="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em] pt-4">Operational Environment</p>
-    </div>
+  <!-- LOADING OVERLAY -->
+  <div id="loading" class="fixed inset-0 z-[9999] bg-black flex flex-col items-center justify-center transition-opacity duration-500 hidden">
+    <div class="w-16 h-16 border-4 border-white/10 border-t-brand-primary rounded-full animate-spin"></div>
+    <p class="mt-8 text-[10px] font-bold tracking-[0.5em] text-white/40 uppercase">Syncing Cloud</p>
   </div>
 
-  <!-- 2. LOADING -->
-  <div id="loading" class="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-apple-light dark:bg-apple-dark transition-opacity duration-700 hidden">
-    <div class="w-12 h-12 border-[3px] border-navy/10 dark:border-white/10 border-t-navy dark:border-t-white rounded-full animate-spin"></div>
-    <p class="mt-6 text-[10px] font-black text-navy/40 dark:text-white/40 uppercase tracking-[0.3em] animate-pulse">Syncing Data...</p>
-  </div>
-
-  <!-- 3. MAIN APP -->
-  <div id="app" class="fixed inset-0 z-[2000] flex flex-col bg-apple-light dark:bg-apple-dark opacity-0 transition-opacity duration-1000 hidden">
-    <header class="safe-top px-10 py-12 flex justify-between items-center">
-      <h1 class="text-3xl font-black tracking-tighter text-navy dark:text-white leading-none">POSTING MAP</h1>
-      <div class="bg-white/60 dark:bg-white/10 px-5 py-2.5 rounded-full flex items-center gap-4 shadow-neu-inset-light dark:shadow-neu-inset-dark">
-        <div id="sync-status" class="w-2 h-2 bg-green-500 rounded-full shadow-[0_0_10px_#22c55e]"></div>
-        <span id="header-pct" class="text-xs font-black text-navy dark:text-blue-400 tracking-tighter">0%</span>
+  <!-- CONTAINER -->
+  <div class="relative w-full h-screen overflow-hidden flex flex-col pt-[var(--safe-top)] pb-[var(--safe-bottom)]">
+    
+    <!-- HEADER -->
+    <header id="main-header" class="px-8 py-8 flex justify-between items-end shrink-0 hidden">
+      <div>
+        <h1 class="text-[10px] font-black tracking-[0.4em] text-white/30 uppercase mb-1">Deployment System</h1>
+        <p class="text-3xl font-black tracking-tighter italic">POSTING MAP</p>
+      </div>
+      <div class="neu-card px-4 py-2 flex items-center gap-3">
+        <div id="sync-dot" class="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_10px_#22c55e]"></div>
+        <span id="header-pct" class="text-sm font-black italic tracking-tighter">0%</span>
       </div>
     </header>
 
-    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-10 space-y-12 pb-48">
-      <!-- AREAS PAGE -->
-      <section id="page-areas" class="page space-y-10">
-        <div id="area-list" class="space-y-8"></div>
-      </section>
-
-      <!-- DETAIL PAGE -->
-      <section id="page-detail" class="page hidden space-y-10">
-        <div class="flex items-center gap-4 mb-4">
-          <button onclick="switchPage('areas')" class="w-12 h-12 neu-flat rounded-2xl flex items-center justify-center text-xl">‹</button>
-          <h2 id="detail-title" class="text-2xl font-black text-navy dark:text-white tracking-tighter truncate">Area Detail</h2>
+    <!-- CONTENT AREA -->
+    <main class="flex-1 overflow-y-auto hide-scrollbar px-6 py-4 relative">
+      
+      <!-- PAGE: GATEWAY -->
+      <section id="page-gateway" class="page-transition h-full flex flex-col items-center justify-center space-y-12 text-center">
+        <div class="neu-card w-48 h-48 p-4 flex items-center justify-center animate-bounce-slow">
+          <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=100" class="w-full h-full object-cover rounded-[2.5rem]">
         </div>
-        <div id="detail-list" class="space-y-10 pb-20"></div>
+        <div class="space-y-4">
+          <h2 class="text-4xl font-black tracking-tighter leading-none uppercase">Strategic<br><span class="text-brand-primary">Posting</span></h2>
+          <p class="text-sm font-medium text-white/40 leading-relaxed">ホーム画面に追加してから<br>オペレーションを開始してください</p>
+        </div>
+        <button onclick="startApp()" class="btn-action btn-primary w-full max-w-xs py-6 rounded-[2rem] text-xl font-black tracking-tight">アプリを起動する</button>
       </section>
 
-      <!-- AUTH/SETTINGS PAGE -->
-      <section id="page-settings" class="page hidden space-y-10">
-        <div class="neu-flat rounded-[3rem] p-12 text-center shadow-2xl">
-          <h2 class="text-3xl font-black text-navy dark:text-white leading-tight mb-10">お名前を登録して<br>ください</h2>
-          <div class="space-y-10 text-left">
-            <div>
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4 ml-2">苗字</label>
-              <input type="text" id="user-last" class="neu-inset w-full rounded-2xl p-6 text-lg font-black text-navy dark:text-white outline-none" placeholder="例：鈴木">
-            </div>
-            <div>
-              <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest block mb-4 ml-2">名前</label>
-              <input type="text" id="user-first" class="neu-inset w-full rounded-2xl p-6 text-lg font-black text-navy dark:text-white outline-none" placeholder="例：一郎">
-            </div>
-            <button onclick="saveProfile()" class="btn-neu w-full bg-navy dark:bg-blue-600 text-white rounded-2xl py-6 text-xl font-black shadow-xl">登録を完了する</button>
+      <!-- PAGE: SETTINGS (REGISTER) -->
+      <section id="page-settings" class="page-transition page-hidden space-y-10 py-10">
+        <div class="space-y-2">
+          <h2 class="text-4xl font-black tracking-tighter">Identify Yourself.</h2>
+          <p class="text-white/40 font-medium">担当者名を入力してください</p>
+        </div>
+        <div class="space-y-8">
+          <div class="space-y-4">
+            <label class="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-4">Last Name / 苗字</label>
+            <input type="text" id="user-last" class="neu-inset input-giant w-full text-white outline-none focus:ring-2 ring-brand-primary/50 transition-all" placeholder="例：鈴木">
+          </div>
+          <div class="space-y-4">
+            <label class="text-[10px] font-black text-white/30 uppercase tracking-[0.3em] ml-4">First Name / 名前</label>
+            <input type="text" id="user-first" class="neu-inset input-giant w-full text-white outline-none focus:ring-2 ring-brand-primary/50 transition-all" placeholder="例：一郎">
+          </div>
+          <button onclick="saveProfile()" class="btn-action btn-primary w-full py-6 rounded-[2rem] text-xl font-black tracking-tight mt-8">登録を完了する</button>
+        </div>
+      </section>
+
+      <!-- PAGE: AREAS -->
+      <section id="page-areas" class="page-transition page-hidden space-y-6 pb-32">
+        <div id="area-list" class="grid gap-6">
+          <!-- Area Cards Inject Here -->
+        </div>
+      </section>
+
+      <!-- PAGE: DETAIL -->
+      <section id="page-detail" class="page-transition page-hidden space-y-8 pb-32">
+        <div class="flex items-center gap-4">
+          <button onclick="switchPage('areas')" class="btn-action w-14 h-14 rounded-2xl flex items-center justify-center text-2xl font-light shrink-0">‹</button>
+          <div class="truncate">
+            <h2 id="detail-title" class="text-2xl font-black tracking-tighter truncate">District Details</h2>
+            <p class="text-[10px] font-bold text-white/30 uppercase tracking-widest">Active Operation</p>
           </div>
         </div>
+        <div id="detail-list" class="space-y-8">
+          <!-- Detail Cards Inject Here -->
+        </div>
       </section>
+
     </main>
 
-    <nav class="fixed bottom-10 left-1/2 -translate-x-1/2 w-[90%] max-w-md z-[4000]">
-      <div class="bg-white/60 dark:bg-black/60 backdrop-blur-3xl rounded-[3.5rem] p-4 shadow-neu-light dark:shadow-neu-dark border border-white/20 flex justify-around items-center h-28 relative">
-        <button onclick="switchPage('areas')" class="nav-btn flex flex-col items-center gap-2 flex-1"><div class="text-2xl">📍</div><span class="text-[9px] font-black uppercase tracking-widest">Areas</span></button>
-        <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-2 flex-1"><div class="text-2xl">⚙️</div><span class="text-[9px] font-black uppercase tracking-widest">Auth</span></button>
+    <!-- NAVIGATION BAR -->
+    <nav id="bottom-nav" class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md hidden fade-in">
+      <div class="neu-card p-3 flex justify-around items-center h-24 backdrop-blur-xl bg-black/80 border border-white/5">
+        <button onclick="switchPage('areas')" class="nav-btn flex flex-col items-center gap-1 flex-1 opacity-100 transition-opacity">
+          <div class="text-2xl mb-1">📍</div>
+          <span class="text-[9px] font-black uppercase tracking-[0.2em]">Map Areas</span>
+        </button>
+        <button onclick="switchPage('settings')" class="nav-btn flex flex-col items-center gap-1 flex-1 opacity-40 transition-opacity">
+          <div class="text-2xl mb-1">👤</div>
+          <span class="text-[9px] font-black uppercase tracking-[0.2em]">Profile</span>
+        </button>
       </div>
     </nav>
+
   </div>
 
   <script>
     const $ = id => document.getElementById(id);
-    let allPoints = [], areaSummary = [], roster = [];
+    let areaSummary = [];
     
-    // GAS API CONFIG (JSON ONLY)
     const API_URL = "https://script.google.com/macros/s/AKfycbyFoJ2Tp7F4MOZ3lNyVDLTl45fVlV-hyAC1uYGL42oXkjBJ3ylST3KUYpaTb0lpK9FmSA/exec";
 
     async function callApi(action, params = {}) {
       let url = API_URL + "?action=" + action;
-      for (let key in params) {
-        url += "&" + key + "=" + encodeURIComponent(params[key]);
-      }
+      for (let key in params) url += "&" + key + "=" + encodeURIComponent(params[key]);
       
       try {
-        const response = await fetch(url, {
-          method: 'GET',
-          mode: 'cors', // 明示的にCORSを指定
-          credentials: 'omit', // 資格情報は不要
-          redirect: 'follow' // リダイレクトを追跡
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP Error: ${response.status}`);
-        }
-        
+        const response = await fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit', redirect: 'follow' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = await response.json();
-        if (data.success === false) {
-          throw new Error(data.message || "API Error");
-        }
+        if (data.success === false) throw new Error(data.message || "API Error");
         return data;
       } catch (err) {
-        console.error("API Connection Error:", err);
-        alert("通信エラーが発生しました。\nURL: " + url + "\n内容: " + err.message);
+        console.error("API Error:", err);
+        alert("通信エラー\n" + err.message);
         throw err;
       }
     }
 
     function startApp() {
-      $('screen-gateway').classList.add('hidden');
-      $('loading').classList.remove('hidden');
+      showLoading(true);
       loadData();
     }
 
@@ -162,119 +199,102 @@
           updateStats();
           
           const saved = localStorage.getItem('user_info');
+          $('main-header').classList.remove('hidden');
+          $('bottom-nav').classList.remove('hidden');
           switchPage(saved ? 'areas' : 'settings');
-          
-          $('app').classList.remove('hidden');
-          setTimeout(() => {
-            $('app').classList.remove('opacity-0');
-            $('loading').classList.add('opacity-0');
-            setTimeout(() => $('loading').classList.add('hidden'), 700);
-          }, 500);
-        } else {
-          throw new Error(data ? data.message : "データが空です");
         }
       } catch (err) {
-        console.error("Startup Error:", err);
-        $('loading').classList.add('hidden');
-        $('screen-gateway').classList.remove('hidden');
+        switchPage('gateway');
+      } finally {
+        showLoading(false);
       }
     }
 
     function renderAreas() {
+      const list = $('area-list');
       if (!areaSummary || areaSummary.length === 0) {
-        $('area-list').innerHTML = '<p class="text-center text-gray-400 py-20 font-bold">データがありません。<br>一括作成を実行してください。</p>';
+        list.innerHTML = '<div class="neu-card p-12 text-center text-white/30 font-bold">NO DATA AVAILABLE</div>';
         return;
       }
-      $('area-list').innerHTML = areaSummary.map(s => `
-        <div class="neu-flat rounded-[2.5rem] p-10 flex items-center active:scale-[0.98] transition-all" onclick="openDetail('${s.name}')">
-          <div class="w-3 h-3 rounded-full mr-8 ${s.progress >= 100 ? 'bg-green-500 shadow-[0_0_15px_#22c55e]' : 'bg-rose-500'}"></div>
+      list.innerHTML = areaSummary.map(s => `
+        <div class="btn-action neu-card p-8 flex items-center" onclick="openDetail('${s.name}')">
+          <div class="w-4 h-4 rounded-full mr-6 ${s.progress >= 100 ? 'bg-green-500 shadow-[0_0_15px_#22c55e]' : 'bg-brand-primary animate-pulse'}"></div>
           <div class="flex-1">
-            <div class="text-xl font-black text-navy dark:text-white tracking-tighter">${s.name}</div>
-            <div class="text-[9px] font-bold text-gray-400 mt-1 uppercase tracking-widest">${s.progress}% Completed</div>
+            <div class="text-xl font-black tracking-tight">${s.name}</div>
+            <div class="text-[9px] font-black text-white/30 uppercase mt-1 tracking-widest">${s.progress}% Completed</div>
           </div>
-          <span class="text-gray-300 text-2xl font-light">›</span>
+          <div class="text-white/20 text-2xl font-light italic">GO</div>
         </div>`).join('');
     }
 
     async function openDetail(name) {
-      $('loading').classList.remove('hidden');
-      $('loading').classList.remove('opacity-0');
-      
+      showLoading(true);
       try {
         const data = await callApi('getAreaDetails', { name: name });
         if (data && data.points) {
           $('detail-title').textContent = name;
           $('detail-list').innerHTML = data.points.map((p, i) => `
-            <div class="neu-flat rounded-[2.5rem] p-10 space-y-8">
-              <div class="flex justify-between items-start gap-6">
-                <div class="text-xl font-black text-navy dark:text-white tracking-tight leading-tight">${p.address}</div>
-                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 neu-flat rounded-2xl flex items-center justify-center text-2xl">📍</a>
+            <div class="neu-card p-8 space-y-6">
+              <div class="flex justify-between items-start gap-4">
+                <div class="text-giant tracking-tighter italic">${p.address}</div>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="btn-action w-16 h-16 flex items-center justify-center text-3xl">📍</a>
               </div>
-              <div class="flex flex-col gap-6">
-                <label class="neu-inset rounded-3xl p-6 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all">
-                  <input type="checkbox" class="w-8 h-8 rounded-xl accent-navy" ${p.isDone?'checked':''} onchange="updateRecord('${name}',${p.rowId},'done',this.checked)">
-                  <span class="text-[10px] font-black uppercase tracking-widest text-navy dark:text-white">${p.isDone?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
-                </label>
-              </div>
+              <label class="neu-inset p-5 flex items-center gap-6 cursor-pointer active:scale-95 transition-all">
+                <input type="checkbox" class="w-10 h-10 rounded-xl accent-brand-primary" ${p.isDone?'checked':''} onchange="updateRecord('${name}',${p.rowId},this.checked)">
+                <span class="text-[11px] font-black uppercase tracking-[0.2em] ${p.isDone?'text-green-500':'text-white/40'}">${p.isDone?'Completed':'Tap to Finish'}</span>
+              </label>
             </div>`).join('');
           switchPage('detail');
         }
-      } catch (e) {
-        alert("詳細データの取得に失敗しました。");
+      } finally {
+        showLoading(false);
       }
-      
-      $('loading').classList.add('opacity-0');
-      setTimeout(() => $('loading').classList.add('hidden'), 700);
     }
 
-    async function updateRecord(areaName, rowId, field, val) {
+    async function updateRecord(areaName, rowId, val) {
       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
       const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
-      
       try {
-        const result = await callApi('submitDistribution', {
-          areaName: areaName,
-          rowId: rowId,
-          staffName: staffName,
-          isDone: val,
-          action: 'submitDistribution'
-        });
-        if (result.success) {
-          loadData();
-        }
-      } catch (e) {
-        alert("更新に失敗しました。");
+        await callApi('submitDistribution', { areaName, rowId, staffName, isDone: val, action: 'submitDistribution' });
+        loadData();
+      } catch (e) { alert("Update Failed"); }
+    }
+
+    function switchPage(pageId) {
+      const sections = ['gateway', 'settings', 'areas', 'detail'];
+      sections.forEach(id => {
+        const el = $('page-' + id);
+        if (id === pageId) el.classList.remove('page-hidden');
+        else el.classList.add('page-hidden');
+      });
+      
+      const navBtns = document.querySelectorAll('.nav-btn');
+      if (pageId === 'areas' || pageId === 'detail') {
+        navBtns[0].style.opacity = '1'; navBtns[1].style.opacity = '0.4';
+      } else if (pageId === 'settings') {
+        navBtns[0].style.opacity = '0.4'; navBtns[1].style.opacity = '1';
       }
     }
 
-    function switchPage(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      const target = $(id === 'detail' ? 'page-detail' : (id === 'settings' ? 'page-settings' : 'page-areas'));
-      if(target) target.classList.remove('hidden');
-      document.querySelectorAll('.nav-btn').forEach((b, i) => { b.style.opacity = (id === 'areas' && i === 0) || (id === 'settings' && i === 1) ? '1' : '0.3'; });
-      $('content').scrollTo(0,0);
+    function showLoading(show) {
+      const el = $('loading');
+      if (show) { el.classList.remove('hidden'); el.classList.remove('opacity-0'); }
+      else { el.classList.add('opacity-0'); setTimeout(() => el.classList.add('hidden'), 500); }
     }
 
     function updateStats() {
       const total = areaSummary.length;
-      if (total === 0) {
-        $('header-pct').textContent = '0%';
-        return;
-      }
+      if (total === 0) return;
       const avg = areaSummary.reduce((acc, cur) => acc + (cur.progress || 0), 0) / total;
       $('header-pct').textContent = Math.round(avg) + '%';
     }
 
     function saveProfile() {
       const last = $('user-last').value.trim(), first = $('user-first').value.trim();
-      if (!last || !first) { alert('姓名を入力してください'); return; }
+      if (!last || !first) return;
       localStorage.setItem('user_info', JSON.stringify({last, first}));
-      switchPage('areas');
+      loadData();
     }
-
-    window.onload = () => {
-      console.log("POSTING MAP PRO initialized.");
-    };
   </script>
 </body>
 </html>
