@@ -6,9 +6,14 @@
 // =============================
 // ⓪ 基本設定
 // =============================
-const SPREADSHEET_ID = '1KuA5pN0ItODhwSJph-fwgj_U_ZyHrn9Osew92D99xBs';
-
 function getSS() {
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    if (ss && ss.getId()) return ss;
+  } catch (e) {
+    // Fallback if not container-bound
+  }
+  const SPREADSHEET_ID = '1KuA5pN0ItODhwSJph-fwgj_U_ZyHrn9Osew92D99xBs';
   if (!SPREADSHEET_ID) throw new Error("SPREADSHEET_ID is not defined.");
   return SpreadsheetApp.openById(SPREADSHEET_ID);
 }
