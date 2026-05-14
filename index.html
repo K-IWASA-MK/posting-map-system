@@ -31,7 +31,18 @@
     .page.hidden { display: none; opacity: 0; }
     .neu-flat { @apply bg-white dark:bg-[#1c1c1e] shadow-[8px_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.4)]; }
     .neu-inset { @apply bg-gray-50 dark:bg-black/20 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5)]; }
-    .btn-neu { @apply transition-all duration-300 active:scale-95; }
+    
+    /* プレミアム・インタラクション・スキル (0.14s ease) */
+    button, .btn-neu, .nav-btn, .clickable-card {
+      transition: all 0.14s ease !important;
+    }
+    button:active, .btn-neu:active, .nav-btn:active, .clickable-card:active {
+      transform: scale(0.96);
+      opacity: 0.92;
+      filter: brightness(1.08);
+      box-shadow: none !important;
+    }
+
     .description { line-height: 160%; }
     input::placeholder { text-align: center; }
   </style>
@@ -182,7 +193,7 @@
       }
       $('area-list').innerHTML = areaSummary.map(s => `
         <div style="background: #0b0b0b; border-radius: 32px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(37,99,235,0.06);" 
-             class="p-8 flex items-center active:scale-[0.98] transition-all" onclick="openDetail('${s.name}')">
+             class="clickable-card p-8 flex items-center" onclick="openDetail('${s.name}')">
           <div class="w-3 h-3 rounded-full mr-6 ${s.progress >= 100 ? 'bg-[#22c55e] shadow-[0_0_15px_#22c55e]' : 'bg-[#e11d48]'}"></div>
           <div class="flex-1">
             <div class="text-lg font-black text-white tracking-tighter">${s.name}</div>
