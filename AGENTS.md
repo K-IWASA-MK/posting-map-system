@@ -74,3 +74,23 @@ clasp push
 clasp deploy
 
 GitHub and GAS deploy separately.
+
+# Stability Rules
+
+Do NOT refactor working API logic unless explicitly instructed.
+
+Preserve existing:
+- fetch structure
+- API response format
+- JSON keys
+- doGet/doPost behavior
+
+Do NOT optimize or simplify working GAS logic automatically.
+
+Priority:
+1. Stability
+2. Compatibility
+3. Existing behavior
+4. Optimization
+
+Avoid breaking existing frontend communication.
