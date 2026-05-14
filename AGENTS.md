@@ -108,3 +108,67 @@ Priority:
 4. Optimization
 
 Avoid breaking existing frontend communication.
+
+# UI DESIGN SYSTEM — POSTING MAP
+
+## Core Style
+* Background: Pure black (#000000)
+* UI Direction: Minimal, Operational, Industrial, High-end PWA, Tesla-like, Apple-like, Professional terminal UI
+* Design Priority: 1. Readability, 2. Simplicity, 3. Spacing, 4. Operational clarity, 5. Minimal colors
+
+## Color Rules
+### Main Colors
+* Black: #000000
+* Primary Blue: #2563eb
+* White: #ffffff
+* Secondary Text: rgba(255,255,255,0.72)
+* Border: rgba(255,255,255,0.08)
+
+## Spacing Rules
+* Large vertical spacing
+* Avoid crowded layouts
+* Minimal information density
+* Wide padding preferred
+
+## Card Style
+Use this as the default base card style:
+```css
+background: #0b0b0b;
+border-radius: 32px;
+border: 1px solid rgba(255,255,255,0.08);
+box-shadow: 0 0 20px rgba(37,99,235,0.06);
+```
+
+## Button Style
+* Large buttons
+* Minimal decoration
+* Rounded corners
+* Blue solid fill
+* White bold text
+* Avoid: gradients, excessive glow, flashy animation
+
+## Typography
+### Main Title
+* Bold
+* White
+* Large size
+### Secondary Text
+* Smaller
+* Softer white
+* line-height: 160%
+
+## UI Philosophy
+The system should feel like:
+* Operational OS
+* Logistics terminal
+* Field management device
+* Professional industrial application
+
+Avoid:
+* playful UI
+* colorful UI
+* template-like design
+* crowded information
+* excessive icons
+
+Less information = stronger design.
