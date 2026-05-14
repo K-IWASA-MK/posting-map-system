@@ -5,12 +5,6 @@
  */
 
 /**
- * モバイルアプリ用：全体サマリー取得（爆速キャッシュ版）
- * 1. CacheService (10分) をチェック
- * 2. なければ PropertiesService をチェック
- * 3. なければ再計算
- */
-/**
  * 戦況マップダッシュボード用：全体サマリー取得（爆速キャッシュ版）
  */
 function getDashboardData() {
@@ -32,50 +26,10 @@ function getDashboardData() {
 }
 
 /**
- * モバイルアプリ用：全データ一括取得（住所リスト + サマリー）
- */
-function getAppData() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const summaryData = getDashboardData();
-  const allPoints = [];
-  
-  const exclude = [
-    CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE,
-    CONFIG.SHEET_POSTAL, CONFIG.SHEET_DISTRICT, CONFIG.SHEET_MASTER_EXPORT,
-    CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL, CONFIG.SHEET_SYSTEM_CACHE
-  ];
-
-  const sheets = ss.getSheets().filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden());
-  
-  sheets.forEach(s => {
-    const name = s.getName();
-    const vals = s.getRange(2, 1, s.getLastRow() - 1, 7).getValues();
-    vals.forEach((row, i) => {
-      if (row[0]) { // 住所がある場合
-        allPoints.push({
-          area: name,
-          idx: i,
-          address: row[0],
-          status: row[3] === true ? 'done' : 'ready',
-          count: row[5],
-          staff: row[6]
-        });
-      }
-    });
-  });
-
-  return {
-    points: allPoints,
-    summary: summaryData.summary,
-    stats: summaryData.stats
-  };
-}
-
-/**
  * 全エリアのサマリーを再計算してキャッシュに保存する (爆速シャドウシート版)
  */
 function refreshAreaSummaryCache() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSS();
   let shadowSheet = ss.getSheetByName(CONFIG.SHEET_SYSTEM_CACHE);
 
   // シャドウシートがなければ作成
@@ -124,7 +78,7 @@ function refreshAreaSummaryCache() {
  * エリアシートが増えた時などに呼び出す
  */
 function createSystemCacheSheet() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSS();
   let sheet = ss.getSheetByName(CONFIG.SHEET_SYSTEM_CACHE);
   
   if (!sheet) {
