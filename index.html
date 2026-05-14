@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>POSTING MAP PRO v2.0-API</title>
-  <!-- Cache Buster: v71 -->
+  <!-- Cache Buster: v72 -->
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="apple-touch-icon" href="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=100">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;900&family=Noto+Sans+JP:wght@400;900&display=swap" rel="stylesheet">
@@ -118,24 +118,25 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbzzRLk1vc3iwLIAolFP76zSVJWddE0Fu8_Ca9-qqT34MGDZiNUeooBLGcUDLzvCJoQ/exec";
 
     async function callApi(action, params = {}) {
-      const url = new URL(API_URL);
-      url.searchParams.append('action', action);
-      Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+      let url = API_URL + "?action=" + action;
+      for (let key in params) {
+        url += "&" + key + "=" + encodeURIComponent(params[key]);
+      }
       
       try {
-        const response = await fetch(url.toString(), {
-          method: 'GET',
-          mode: 'cors',
-          cache: 'no-cache',
-          redirect: 'follow'
-        });
-        if (!response.ok) throw new Error("Network response was not ok: " + response.statusText);
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP Error: ${response.status}`);
+        }
         const data = await response.json();
-        console.log("API Response:", data);
+        if (data.success === false) {
+          throw new Error(data.message || "API Error");
+        }
         return data;
       } catch (err) {
-        console.error("API Error:", err);
-        return { success: false, message: "通信に失敗しました: " + err.message };
+        console.error("API Connection Error:", err);
+        alert("通信エラーが発生しました。\nURL: " + url + "\n内容: " + err.message);
+        throw err;
       }
     }
 
@@ -166,13 +167,17 @@
           throw new Error(data ? data.message : "データが空です");
         }
       } catch (err) {
-        alert("起動エラー\n" + err.message + "\n\nGASのデプロイ設定が「全員（Anyone）」になっているか確認してください。");
+        console.error("Startup Error:", err);
         $('loading').classList.add('hidden');
         $('screen-gateway').classList.remove('hidden');
       }
     }
 
     function renderAreas() {
+      if (!areaSummary || areaSummary.length === 0) {
+        $('area-list').innerHTML = '<p class="text-center text-gray-400 py-20 font-bold">データがありません。<br>一括作成を実行してください。</p>';
+        return;
+      }
       $('area-list').innerHTML = areaSummary.map(s => `
         <div class="neu-flat rounded-[2.5rem] p-10 flex items-center active:scale-[0.98] transition-all" onclick="openDetail('${s.name}')">
           <div class="w-3 h-3 rounded-full mr-8 ${s.progress >= 100 ? 'bg-green-500 shadow-[0_0_15px_#22c55e]' : 'bg-rose-500'}"></div>
@@ -188,23 +193,27 @@
       $('loading').classList.remove('hidden');
       $('loading').classList.remove('opacity-0');
       
-      const data = await callApi('getAreaDetails', { name: name });
-      if (data && data.points) {
-        $('detail-title').textContent = name;
-        $('detail-list').innerHTML = data.points.map((p, i) => `
-          <div class="neu-flat rounded-[2.5rem] p-10 space-y-8">
-            <div class="flex justify-between items-start gap-6">
-              <div class="text-xl font-black text-navy dark:text-white tracking-tight leading-tight">${p.address}</div>
-              <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 neu-flat rounded-2xl flex items-center justify-center text-2xl">📍</a>
-            </div>
-            <div class="flex flex-col gap-6">
-              <label class="neu-inset rounded-3xl p-6 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all">
-                <input type="checkbox" class="w-8 h-8 rounded-xl accent-navy" ${p.isDone?'checked':''} onchange="updateRecord('${name}',${p.rowId},'done',this.checked)">
-                <span class="text-[10px] font-black uppercase tracking-widest text-navy dark:text-white">${p.isDone?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
-              </label>
-            </div>
-          </div>`).join('');
-        switchPage('detail');
+      try {
+        const data = await callApi('getAreaDetails', { name: name });
+        if (data && data.points) {
+          $('detail-title').textContent = name;
+          $('detail-list').innerHTML = data.points.map((p, i) => `
+            <div class="neu-flat rounded-[2.5rem] p-10 space-y-8">
+              <div class="flex justify-between items-start gap-6">
+                <div class="text-xl font-black text-navy dark:text-white tracking-tight leading-tight">${p.address}</div>
+                <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}" target="_blank" class="w-14 h-14 neu-flat rounded-2xl flex items-center justify-center text-2xl">📍</a>
+              </div>
+              <div class="flex flex-col gap-6">
+                <label class="neu-inset rounded-3xl p-6 flex items-center gap-5 cursor-pointer active:scale-[0.98] transition-all">
+                  <input type="checkbox" class="w-8 h-8 rounded-xl accent-navy" ${p.isDone?'checked':''} onchange="updateRecord('${name}',${p.rowId},'done',this.checked)">
+                  <span class="text-[10px] font-black uppercase tracking-widest text-navy dark:text-white">${p.isDone?'MISSION COMPLETED':'READY TO DEPLOY'}</span>
+                </label>
+              </div>
+            </div>`).join('');
+          switchPage('detail');
+        }
+      } catch (e) {
+        alert("詳細データの取得に失敗しました。");
       }
       
       $('loading').classList.add('opacity-0');
@@ -215,18 +224,19 @@
       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
       const staffName = `${userInfo.last || ''} ${userInfo.first || ''}`.trim();
       
-      // GETで簡易更新（GASの制約上、GETが最も確実）
-      const result = await callApi('submitDistribution', {
-        areaName: areaName,
-        rowId: rowId,
-        staffName: staffName,
-        isDone: val,
-        action: 'submitDistribution'
-      });
-      
-      if (result.success) {
-        // 成功したら進捗を再計算（簡易化のため再ロード）
-        loadData();
+      try {
+        const result = await callApi('submitDistribution', {
+          areaName: areaName,
+          rowId: rowId,
+          staffName: staffName,
+          isDone: val,
+          action: 'submitDistribution'
+        });
+        if (result.success) {
+          loadData();
+        }
+      } catch (e) {
+        alert("更新に失敗しました。");
       }
     }
 
@@ -240,8 +250,11 @@
 
     function updateStats() {
       const total = areaSummary.length;
-      if (total === 0) return;
-      const avg = areaSummary.reduce((acc, cur) => acc + cur.progress, 0) / total;
+      if (total === 0) {
+        $('header-pct').textContent = '0%';
+        return;
+      }
+      const avg = areaSummary.reduce((acc, cur) => acc + (cur.progress || 0), 0) / total;
       $('header-pct').textContent = Math.round(avg) + '%';
     }
 
@@ -252,10 +265,8 @@
       switchPage('areas');
     }
 
-    // 初回起動
     window.onload = () => {
-      // PWAやGitHub Pages環境での初期化
-      console.log("POSTING MAP PRO initialized on GitHub Pages.");
+      console.log("POSTING MAP PRO initialized.");
     };
   </script>
 </body>

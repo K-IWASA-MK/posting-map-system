@@ -322,11 +322,20 @@ function setupRosterSheet() {
     sheet = ss.insertSheet(CONFIG.SHEET_ROSTER);
   }
 
-  // ヘッダーを設定
+  // ★ 修正: 一旦全データをクリアして真っ新にする
+  sheet.clear();
   sheet.getRange(1, 1, 1, 3).setValues([["ID", "苗字", "名前"]]);
   sheet.setFrozenRows(1); // 1行目を固定
   
   formatRosterSheet(); // 整形も同時に行う
 
-  return "名簿シートを初期化（復旧）しました。";
+  return "名簿シートを真っ新に初期化しました。";
+}
+
+/**
+ * 管理者権限をチェックする
+ */
+function isNotAdmin() {
+  // 現時点では全員を管理者として扱う（将来的にメールアドレス制限などを入れる場合はここを修正）
+  return false;
 }

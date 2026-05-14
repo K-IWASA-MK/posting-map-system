@@ -75,9 +75,22 @@ function generateAreaSheetsBatch() {
       cityCounts[currentCity] === 1
         ? currentCity
         : `${currentCity}(${cityCounts[currentCity]})`;
-    let sheet =
-      ss.getSheetByName(sheetName) ||
-      baseSheet.copyTo(ss).setName(sheetName).showSheet();
+    
+    // シートの取得/作成ロジックを堅牢化
+    let sheet = ss.getSheetByName(sheetName);
+    if (!sheet) {
+      try {
+        sheet = baseSheet.copyTo(ss).setName(sheetName);
+      } catch (e) {
+        // 重複エラーが発生した場合のリカバリ
+        sheet = ss.getSheetByName(sheetName);
+        if (!sheet) {
+          // それでも取得できない場合は名前を少し変えて作成
+          sheet = baseSheet.copyTo(ss).setName(sheetName + " ");
+        }
+      }
+    }
+    sheet.showSheet();
 
     // シートの初期化とデザイン適用（新しいシートの開始時のみ）
     if (itemsInBlock === 0) {
