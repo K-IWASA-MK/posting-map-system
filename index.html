@@ -32,15 +32,29 @@
     .neu-flat { @apply bg-white dark:bg-[#1c1c1e] shadow-[8px_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.4)]; }
     .neu-inset { @apply bg-gray-50 dark:bg-black/20 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5)]; }
     
-    /* プレミアム・インタラクション・スキル (0.14s ease) */
+    /* プレミアム・インタラクション・ヒエラルキー (0.14s ease) */
     button, .btn-neu, .nav-btn, .clickable-card {
       transition: all 0.14s ease !important;
     }
-    button:active, .btn-neu:active, .nav-btn:active, .clickable-card:active {
+    
+    /* PRIMARY (主操作: 起動・登録ボタン等) */
+    .btn-neu:active {
       transform: scale(0.96);
-      opacity: 0.92;
       filter: brightness(1.08);
       box-shadow: none !important;
+    }
+
+    /* SECONDARY (補助操作: エリアカード等) */
+    .clickable-card:active {
+      transform: scale(0.985);
+      opacity: 0.96;
+      box-shadow: none !important;
+    }
+
+    /* NAV BUTTON (ナビ操作: 背景変化のみ) */
+    .nav-btn:active {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-radius: 1.5rem;
     }
 
     .description { line-height: 160%; }
