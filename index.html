@@ -256,19 +256,20 @@
       const container = $('settings-content');
       
       if (!userInfo) {
-        // Card 1: Registration (Corrected size & line break)
+        // Card 1: Registration (Splash-style color hierarchy)
         container.innerHTML = `
           <div class="flex flex-col items-center justify-center py-10 px-4">
             <div class="mb-16 text-center">
-              <h2 class="text-xl font-black text-white leading-tight">お名前を登録して<br>ください</h2>
+              <h2 style="color: #ffffff;" class="text-xl font-black leading-tight">お名前を登録して</h2>
+              <p style="color: rgba(255,255,255,0.72);" class="text-sm font-medium mt-1">ください</p>
             </div>
             <div class="w-full space-y-10 text-left">
               <div>
-                <label class="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 block ml-1">苗字</label>
+                <label style="color: rgba(255,255,255,0.72);" class="text-[11px] font-black uppercase tracking-[0.2em] mb-4 block ml-1">苗字</label>
                 <input type="text" id="user-last" class="w-full bg-white rounded-[1.8rem] p-7 text-2xl font-black text-black outline-none shadow-xl" placeholder="例：鈴木">
               </div>
               <div>
-                <label class="text-[11px] font-black text-gray-500 uppercase tracking-[0.2em] mb-4 block ml-1">名前</label>
+                <label style="color: rgba(255,255,255,0.72);" class="text-[11px] font-black uppercase tracking-[0.2em] mb-4 block ml-1">名前</label>
                 <input type="text" id="user-first" class="w-full bg-white rounded-[1.8rem] p-7 text-2xl font-black text-black outline-none shadow-xl" placeholder="例：一郎">
               </div>
               <button onclick="saveProfile()" class="btn-neu w-full bg-[#2563eb] text-white rounded-[1.8rem] py-7 text-xl font-black shadow-xl transition-all">登録を完了する</button>
