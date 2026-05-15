@@ -202,11 +202,15 @@
           throw new Error(`HTTP Error: ${response.status}`);
         }
         
-      const data = await response.json();
-      if (data.success === false) {
-        throw new Error(data.message || "API Error");
+        const data = await response.json();
+        if (data.success === false) {
+          throw new Error(data.message || "API Error");
+        }
+        return data;
+      } catch (err) {
+        console.error("API Connection Error:", err);
+        throw err;
       }
-      return data;
     }
 
     function startApp() {
