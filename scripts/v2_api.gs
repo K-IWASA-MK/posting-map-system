@@ -107,7 +107,6 @@ function getAppData() {
   const ss = getSS();
   const sheets = ss.getSheets();
   
-  // 除外するシート名のリスト
   const systemSheets = [
     CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE, 
     CONFIG.SHEET_POSTAL, CONFIG.SHEET_DISTRICT, CONFIG.SHEET_MASTER_EXPORT, 
@@ -117,19 +116,11 @@ function getAppData() {
   const areas = [];
   sheets.forEach(s => {
     const name = s.getName();
-    // システム用シートでなく、かつ非表示でないシートを「地区」とみなす
     if (!systemSheets.includes(name) && !s.isSheetHidden()) {
-      const lastRow = s.getLastRow();
-      let progress = 0;
-      if (lastRow > 1) {
-        const doneValues = s.getRange(2, 4, lastRow - 1, 1).getValues().flat();
-        const total = doneValues.length;
-        const completed = doneValues.filter(v => v === true || v === "TRUE").length;
-        progress = total > 0 ? Math.round((completed / total) * 100) : 0;
-      }
+      // 重い計算は一旦やめて、0%として爆速で返す（後ほど非同期化などで対応）
       areas.push({
         name: name,
-        progress: progress
+        progress: 0 
       });
     }
   });

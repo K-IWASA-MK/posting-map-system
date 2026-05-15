@@ -438,12 +438,14 @@
 
     window.onload = () => {
       const saved = localStorage.getItem('user_info');
-      if (saved) {
-        // 登録済みならスプラッシュを即座に隠して起動
+      // 厳格なチェック: 文字列の "null" や "undefined" も除外
+      if (saved && saved !== "null" && saved !== "undefined") {
+        console.log("Registered user detected. Auto-launching...");
         $('screen-gateway').classList.add('hidden');
         loadData();
       } else {
-        console.log("POSTING MAP PRO: Initial splash mode.");
+        console.log("New user detected. Showing splash gateway.");
+        $('screen-gateway').classList.remove('hidden');
       }
     };
   </script>
