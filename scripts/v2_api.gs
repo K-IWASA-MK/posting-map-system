@@ -105,18 +105,20 @@ function createJsonResponse(data) {
 
 function getAppData() {
   const ss = getSS();
-  const guideSheet = ss.getSheetByName(CONFIG.SHEET_GUIDE);
-  if (!guideSheet) throw new Error("Guide sheet not found");
-
-  const lastRow = guideSheet.getLastRow();
-  if (lastRow < 2) return { areas: [] };
+  const sheets = ss.getSheets();
   
-  const values = guideSheet.getRange(2, 1, lastRow - 1, 8).getValues();
-  const areas = values
-    .filter(r => r[0] && r[0] !== "")
-    .map(r => ({
-      name: r[0],
-      progress: Math.round(parseFloat(r[6]) * 100) || 0
+  // 除外するシステムシートのリスト
+  const exclude = [
+    CONFIG.SHEET_GUIDE, CONFIG.SHEET_ROSTER, CONFIG.SHEET_TEMPLATE,
+    CONFIG.SHEET_POSTAL, CONFIG.SHEET_DISTRICT, CONFIG.SHEET_MASTER_EXPORT,
+    CONFIG.SHEET_REPORT, CONFIG.SHEET_MANUAL, CONFIG.SHEET_SYSTEM_CACHE
+  ];
+
+  const areas = sheets
+    .filter(s => !exclude.includes(s.getName()) && !s.isSheetHidden())
+    .map(s => ({
+      name: s.getName(),
+      progress: 0 // 高速化のため進捗計算は一旦スキップ
     }));
 
   return {
