@@ -71,7 +71,7 @@ git push origin main
 
 GAS changes:
 clasp push
-clasp deploy
+clasp deploy -i <deployment_id> (IDを固定して更新することを推奨)
 
 GitHub and GAS deploy separately.
 
