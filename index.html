@@ -63,28 +63,23 @@
 </head>
 <body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
-  <!-- 1. SPLASH / GATEWAY -->
-  <div id="screen-gateway" class="fixed inset-0 z-[10000] bg-[#000000] flex flex-col items-center justify-center p-10 text-center gap-10">
-    <!-- Icon -->
-    <div class="w-44 h-44 bg-white/5 backdrop-blur-2xl rounded-[3.8rem] border border-white/10 flex items-center justify-center overflow-hidden p-1 relative shadow-2xl">
-      <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=200" class="w-full h-full object-cover rounded-[3.5rem] z-10">
+  <!-- 1. GATEWAY / SPLASH -->
+  <div id="screen-gateway" class="fixed inset-0 z-[1000] bg-[#000000] flex flex-col items-center justify-center p-10 text-center">
+    <div class="flex flex-col items-center justify-center mb-6 mt-0">
+      <div class="w-44 h-44 bg-white/5 backdrop-blur-2xl rounded-[3.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
+        <img src="https://area-management.github.io/posting-map-system/assets/icon180-v2.png?v=200" class="w-full h-full object-cover rounded-[3.5rem] z-10">
+      </div>
+      <div class="mb-12 text-center">
+        <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">ホーム画面へ追加してから</h2>
+        <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2">アプリをご利用ください</p>
+      </div>
     </div>
-
-    <!-- Text Group -->
-    <div class="text-center space-y-2">
-      <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">ホーム画面へ追加してから</h2>
-      <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium">アプリをご利用ください</p>
-    </div>
-
-    <!-- Button Group -->
-    <div class="w-full max-w-sm">
+    <div class="w-full max-w-sm space-y-4">
       <div class="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl">
         <button onclick="startApp()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">アプリを起動する</button>
       </div>
+      <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] pt-4">Operational Environment</p>
     </div>
-
-    <!-- Footer -->
-    <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] mt-4">Operational Environment</p>
   </div>
 
   <!-- 2. LOADING -->
