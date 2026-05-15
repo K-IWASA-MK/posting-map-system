@@ -205,8 +205,8 @@
           setTimeout(() => {
             $('app').classList.remove('opacity-0');
             $('loading').classList.add('opacity-0');
-            setTimeout(() => $('loading').classList.add('hidden'), 700);
-          }, 500);
+            setTimeout(() => $('loading').classList.add('hidden'), 400);
+          }, 100);
         } else {
           throw new Error(data ? data.message : "データが空です");
         }

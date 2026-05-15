@@ -124,15 +124,15 @@
       $('screen-gateway').classList.add('hidden');
       $('loading').classList.remove('hidden');
       
-      // Simulate data fetch
+      // Simulate data fetch (Accelerated)
       setTimeout(() => {
         $('app').classList.remove('hidden');
         setTimeout(() => {
           $('app').classList.remove('opacity-0');
           $('loading').classList.add('opacity-0');
-          setTimeout(() => $('loading').classList.add('hidden'), 700);
-        }, 500);
-      }, 1000);
+          setTimeout(() => $('loading').classList.add('hidden'), 400);
+        }, 100);
+      }, 300);
     }
   </script>
 </body>
