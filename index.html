@@ -258,11 +258,16 @@
         return;
       }
 
-      // 業務に関係ないシートをキーワードで徹底除外（String変換で型エラーを防止）
+      // 業務に関係ないカードを徹底除外（説明文やガイドを排除）
       $('area-list').innerHTML = areaSummary
         .filter(s => {
           const n = String(s.name || "");
-          return n && !n.includes('ガイド') && !n.includes('名簿') && !n.includes('使い方');
+          // 以下のいずれかに該当すれば除外:
+          // 1. キーワードが含まれる
+          // 2. 文字数が20文字以上（地区名としては長すぎる＝説明文と判断）
+          const isGuide = n.includes('ガイド') || n.includes('名簿') || n.includes('使い方') || 
+                          n.includes('三重第2区') || n.includes('活動') || n.includes('手順');
+          return n && !isGuide && n.length < 20;
         })
         .map(s => `
         <div style="background: #0b0b0b; border-radius: 32px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(37,99,235,0.06);" 
