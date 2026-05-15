@@ -258,9 +258,12 @@
         return;
       }
 
-      // 業務に関係ないシート（ガイド、名簿、使い方など）をキーワードで徹底除外
+      // 業務に関係ないシートをキーワードで徹底除外（String変換で型エラーを防止）
       $('area-list').innerHTML = areaSummary
-        .filter(s => s.name && !s.name.includes('ガイド') && !s.name.includes('名簿') && !s.name.includes('使い方'))
+        .filter(s => {
+          const n = String(s.name || "");
+          return n && !n.includes('ガイド') && !n.includes('名簿') && !n.includes('使い方');
+        })
         .map(s => `
         <div style="background: #0b0b0b; border-radius: 32px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(37,99,235,0.06);" 
              class="clickable-card p-8 flex items-center" onclick="openDetail('${s.name}')">
