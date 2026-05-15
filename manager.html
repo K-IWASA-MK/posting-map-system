@@ -28,50 +28,73 @@
     .hide-scrollbar::-webkit-scrollbar { display: none; }
     .page { display: block; opacity: 1; transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1); }
     .page.hidden { display: none; opacity: 0; }
-    .neu-flat { @apply bg-white dark:bg-[#1c1c1e] shadow-[8px_8px_20px_rgba(0,0,0,0.05)] dark:shadow-[8px_8px_20px_rgba(0,0,0,0.4)]; }
-    .neu-inset { @apply bg-gray-50 dark:bg-black/20 shadow-[inset_4px_4px_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_4px_4px_10px_rgba(0,0,0,0.5)]; }
-    .btn-neu { @apply transition-all duration-300 active:scale-95; }
+    /* プレミアム・インタラクション・ヒエラルキー (0.14s ease) */
+    button, .btn-neu, .nav-btn, .clickable-card {
+      transition: all 0.14s ease !important;
+    }
+    
+    /* PRIMARY (主操作: 起動ボタン等) */
+    .btn-neu:active {
+      transform: scale(0.96);
+      filter: brightness(1.08);
+      box-shadow: none !important;
+    }
+
+    /* SECONDARY (補助操作) */
+    .clickable-card:active {
+      transform: scale(0.985);
+      opacity: 0.96;
+      box-shadow: none !important;
+    }
+
     .description { line-height: 160%; }
+    input::placeholder { text-align: center; }
   </style>
 </head>
-<body class="bg-apple-light dark:bg-apple-dark text-[#1d1d1f] dark:text-[#f5f5f7] font-sans antialiased overflow-hidden select-none transition-colors duration-500">
+<body class="bg-[#000000] text-white font-sans antialiased overflow-hidden select-none transition-colors duration-500">
 
   <!-- 1. GATEWAY / SPLASH (MANAGER VERSION) -->
-  <div id="screen-gateway" class="fixed inset-0 z-[1000] bg-apple-light dark:bg-apple-dark flex flex-col items-center justify-center p-10 text-center">
+  <div id="screen-gateway" class="fixed inset-0 z-[1000] bg-[#000000] flex flex-col items-center justify-center p-10 text-center">
     <div class="flex flex-col items-center justify-center mb-6 mt-0">
-      <div class="w-44 h-44 bg-apple-light dark:bg-[#1c1c1e] rounded-[3.8rem] shadow-neu-light dark:shadow-neu-dark flex items-center justify-center overflow-hidden mb-6 p-1 relative">
+      <div class="w-44 h-44 bg-white/5 backdrop-blur-2xl rounded-[3.8rem] border border-white/10 flex items-center justify-center overflow-hidden mb-6 p-1 relative shadow-2xl">
         <img src="https://area-management.github.io/posting-map-system/assets/icon-admin-panel-180.png?v=101" class="w-full h-full object-cover rounded-[3.5rem] z-10">
       </div>
-      <p class="description text-gray-500 dark:text-gray-400 text-sm">
-        <span class="font-black">管理者専用画面です</span><br>
-        <span class="font-medium">ホーム画面に追加してご利用ください</span>
-      </p>
+      <div class="mb-12 text-center">
+        <h2 style="color: rgba(255,255,255,0.72);" class="text-base font-black leading-tight">管理者専用の管理画面です</h2>
+        <p style="color: rgba(255,255,255,0.4);" class="text-[11px] font-medium mt-2">ホーム画面に追加してご利用ください</p>
+      </div>
     </div>
     <div class="w-full max-w-sm space-y-4">
-      <div class="bg-white/40 dark:bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 shadow-[0_0_20px_rgba(37,99,235,0.08)] border border-white/20">
-        <button onclick="startAdmin()" class="btn-neu w-full bg-navy dark:bg-blue-600 text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">管理画面を起動する</button>
+      <div class="bg-white/5 backdrop-blur-2xl rounded-[2.5rem] p-8 border border-white/10 shadow-2xl">
+        <button onclick="startAdmin()" class="btn-neu w-full bg-[#2563eb] text-white rounded-2xl py-6 text-lg font-black shadow-xl uppercase tracking-tighter">管理画面を起動する</button>
       </div>
-      <p class="text-[10px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-[0.4em] pt-4">Administrator Mode</p>
+      <p class="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em] pt-4">Administrator Mode</p>
     </div>
   </div>
 
   <!-- 2. LOADING -->
-  <div id="loading" class="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-apple-light dark:bg-apple-dark transition-opacity duration-700 hidden">
-    <div class="w-12 h-12 border-[3px] border-navy/10 dark:border-white/10 border-t-navy dark:border-t-white rounded-full animate-spin"></div>
-    <p class="mt-6 text-[10px] font-black text-navy/40 dark:text-white/40 uppercase tracking-[0.3em] animate-pulse">Syncing Admin Data...</p>
+  <div id="loading" class="fixed inset-0 z-[5000] flex flex-col items-center justify-center bg-[#000000] transition-opacity duration-700 hidden">
+    <div class="w-12 h-12 border-[3px] border-white/10 border-t-[#2563eb] rounded-full animate-spin"></div>
+    <p class="mt-6 text-[10px] font-black text-white/40 uppercase tracking-[0.3em] animate-pulse">Syncing Admin Data...</p>
   </div>
 
   <!-- 3. MAIN ADMIN APP -->
-  <div id="app" class="fixed inset-0 z-[2000] flex flex-col bg-apple-light dark:bg-apple-dark opacity-0 transition-opacity duration-1000 hidden">
-    <header class="safe-top px-10 py-12 flex justify-between items-center">
-      <h1 class="text-3xl font-black tracking-tighter text-navy dark:text-white leading-none">ADMIN DASHBOARD</h1>
-      <button onclick="location.reload()" class="w-12 h-12 neu-flat rounded-2xl flex items-center justify-center text-xl">🔄</button>
+  <div id="app" class="fixed inset-0 z-[2000] flex flex-col bg-[#000000] opacity-0 transition-opacity duration-1000 hidden">
+    <header class="safe-top px-8 py-8 flex justify-between items-center">
+      <h1 class="text-2xl font-black tracking-tighter text-white leading-none">ADMIN PANEL</h1>
+      <div class="bg-white/5 backdrop-blur-xl px-5 py-2 rounded-full flex items-center gap-3 border border-white/10">
+        <div class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]"></div>
+        <span class="text-xs font-black text-[#2563eb] tracking-tighter">API ACTIVE</span>
+      </div>
     </header>
 
-    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-10 space-y-12 pb-48">
-      <div class="neu-flat rounded-[3rem] p-12 text-center shadow-2xl">
-        <h2 class="text-3xl font-black text-navy dark:text-white leading-tight mb-6">管理機能準備中</h2>
-        <p class="text-gray-400 font-bold text-sm">API連携による戦略ダッシュボードを<br>順次展開します。</p>
+    <main id="content" class="flex-1 overflow-y-auto hide-scrollbar px-8 space-y-12 pb-48">
+      <div style="background: #0b0b0b; border-radius: 32px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(37,99,235,0.06);" class="p-12 text-center shadow-2xl">
+        <div class="mb-10">
+          <p class="text-sm text-gray-400 font-black mb-2">管理機能準備中</p>
+          <p class="text-[11px] text-gray-600 font-medium">API連携による戦略ダッシュボードを<br>順次展開します。</p>
+        </div>
+        <button onclick="location.reload()" class="btn-neu w-full bg-white/5 text-gray-400 rounded-2xl py-4 text-xs font-black uppercase tracking-widest border border-white/5">再読み込み</button>
       </div>
     </main>
   </div>
