@@ -358,17 +358,18 @@
               ${userInfo.id ? `<div class="text-xl font-black text-[#2563eb] tracking-[0.4em] font-mono pl-2">${userInfo.id}</div>` : ''}
             </div>
             
-            <div style="background: #0b0b0b; border-radius: 32px; border: 1px solid rgba(255,255,255,0.08);" class="w-full p-12 text-center">
-              <div class="inline-flex items-center gap-3 mb-10">
-                <span class="w-3 h-3 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]"></span>
-                <span class="text-[11px] font-black text-[#22c55e] uppercase tracking-[0.3em]">Authorized Staff</span>
+            <div style="width: 260px; height: 220px; border-radius: 28px; background: rgba(255,255,255,0.015); box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);" class="mx-auto flex flex-col items-center justify-center">
+              <div class="inline-flex items-center gap-2 mb-4">
+                <span class="w-2 h-2 bg-[#22c55e] rounded-full shadow-[0_0_8px_#22c55e]"></span>
+                <span class="text-[8px] font-black text-[#22c55e] uppercase tracking-[0.3em]">Authorized Staff</span>
               </div>
               
-              <h3 class="text-4xl font-black text-white tracking-tighter mb-8 flex flex-col items-center gap-1">
-                <span>${userInfo.last}</span>
-                <span>${userInfo.first}</span>
-              </h3>
-              <p class="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em]">Field Operations</p>
+              <div style="font-size: 72px; font-weight: 900; color: #ffffff; text-align: center; letter-spacing: 0.05em; line-height: 1.05;" class="flex flex-col items-center mb-3">
+                <div>${userInfo.last}</div>
+                <div>${userInfo.first}</div>
+              </div>
+              
+              <p class="text-[8px] font-black text-gray-500 uppercase tracking-[0.3em]">Field Operations</p>
             </div>
             
             <div class="w-full mt-20 pb-8">
