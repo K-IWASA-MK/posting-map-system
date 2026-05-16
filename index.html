@@ -352,11 +352,12 @@
                 <span class="text-[11px] font-black text-[#22c55e] uppercase tracking-[0.3em]">Authorized Staff</span>
               </div>
               
-              <h3 class="text-4xl font-black text-white tracking-tighter mb-4 flex flex-col items-center gap-1">
+              <h3 class="text-4xl font-black text-white tracking-tighter mb-6 flex flex-col items-center gap-1">
                 <span>${userInfo.last}</span>
                 <span>${userInfo.first}</span>
               </h3>
-              <p class="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em] mt-8">Field Operations</p>
+              ${userInfo.id ? `<div class="text-sm font-black text-[#2563eb] tracking-[0.3em] mb-8 font-mono">${userInfo.id}</div>` : ''}
+              <p class="text-[11px] font-black text-gray-500 uppercase tracking-[0.3em]">Field Operations</p>
             </div>
             
             <div class="w-full mt-20 pb-8">
